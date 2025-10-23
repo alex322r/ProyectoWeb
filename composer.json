@@ -1,0 +1,17 @@
+{
+    "name": "alex/consultorio-psicologico",
+    "description": "a php project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alex, Luis, William"
+        }
+    ],
+    "require": {
+        "bramus/router": "^1.6"
+    }
+}
