@@ -25,7 +25,11 @@
         </div>
         <br>
         <p><a href="#">¿Olvidaste tu contraseña?</a></p>
-    
+
+        <?php if (!empty($_GET['error'])) : ?>
+            <p style="color: red; text-align: center;"><?php echo htmlspecialchars($_GET['error']); ?></p>
+        <?php endif; ?>
+
         <button type="submit">Iniciar sesión</button>
     </form>
 </body>

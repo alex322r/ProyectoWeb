@@ -1,8 +1,9 @@
 <?php
-if(!isset($_SESSION['user_id'])) {
-  header('Locatation: /login');
-  exit;
-}
+
+  if(!isset($_SESSION['user_id'])) {
+    header('Locatation: /login');
+    exit;
+  }
 
   $userName = $_SESSION['user_name'] ?? 'Usuario';
   $userRole = $_SESSION['user_role'] ?? 'Rol';

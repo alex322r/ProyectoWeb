@@ -9,13 +9,15 @@ function view($name, $data = []) {
   extract($data);
 
   if ($name === 'login') {
-        require __DIR__ . "/../views/login.php";
-        return; // Detenemos aquí
+    require __DIR__ . "/../views/login.php";
+    return; // Detenemos aquí
+  }
+  if ($name === 'home') {
+    require __DIR__ . "/../views/home.php";
+    return; // Detenemos aquí
   }
 
   ob_start();
-
-
   require __DIR__ . "/../views/{$name}.php";
 
   $content = ob_get_clean();
@@ -30,8 +32,8 @@ use App\Controllers\AuthController; //
 
 
 $dsn = 'mysql:host=127.0.0.1;dbname=consultorio_psicologico';
-$usuario = 'usuario_monitor';
-$pass = '123456';
+$usuario = 'root';
+$pass = '';
 
 $options = [
   PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -104,7 +106,8 @@ $router->get('/pacientes', function() use ($pdo) {
     
     // Por ahora, solo llamamos a la vista:
     view('pacientes', [
-        'titulo' => 'Pacientes'
+        'titulo' => 'Pacientes',
+        'ingresosDia' => 1220 // Dato de ejemplo
     ]);
 });
 

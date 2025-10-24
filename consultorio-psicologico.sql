@@ -42,6 +42,8 @@ CREATE TABLE empleado (
     especialidad VARCHAR(100),
     usuario VARCHAR(50) UNIQUE NOT NULL,
     clave VARCHAR(255) NOT NULL,
+    intentos_fallidos INT DEFAULT 0,
+    bloqueado_hasta DATETIME,
     FOREIGN KEY (id_persona) REFERENCES persona (id_persona)
 ) ENGINE=InnoDB;
 
