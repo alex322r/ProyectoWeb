@@ -44,7 +44,7 @@ class AuthController
             $_SESSION['user_email'] = $user['usuario'];
 
             // Redirigimos al dashboard (la home)
-            header('Location: /');
+            header('Location: /dashboard');
             exit;
 
         } else {

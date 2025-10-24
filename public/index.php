@@ -66,13 +66,46 @@ $router->get('/login', [$authController, 'showLoginForm']);
 $router->post('/login', [$authController, 'handleLogin']);
 $router->get('/logout', [$authController, 'logout']);
 
+$router->before('GET|POST', '/(dashboard|pacientes|agenda|pagos|planes|empleados|reportes|config|api/.*)', function() {
+    // Si la variable de sesión 'user_id' no existe, lo botamos al login
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: /login');
+        exit(); // Detenemos la ejecución
+    }
+});
 
-$router->get('/dashboard', function() {
 
-  view('dashboard', [
-    'titulo' => 'dashboard'
-  ]);
 
+$router->get('/dashboard', function() use ($pdo) {
+    // Aquí deberías llamar a un controlador, ej. DashboardController
+    // Y pasarle datos de la BD
+    
+    // $dashboardController = new DashboardController($pdo);
+    // $data = $dashboardController->getDashboardData();
+    
+    // view('dashboard', $data);
+    
+    // Por ahora, solo llamamos a la vista:
+    view('dashboard', [
+        'titulo' => 'Dashboard',
+        'citasHoy' => 12, // Dato de ejemplo
+        'ingresosDia' => 1220 // Dato de ejemplo
+    ]);
+});
+
+$router->get('/pacientes', function() use ($pdo) {
+    // Aquí deberías llamar a un controlador, ej. DashboardController
+    // Y pasarle datos de la BD
+    
+    // $dashboardController = new DashboardController($pdo);
+    // $data = $dashboardController->getDashboardData();
+    
+    // view('dashboard', $data);
+    
+    // Por ahora, solo llamamos a la vista:
+    view('pacientes', [
+        'titulo' => 'Pacientes'
+    ]);
 });
 
 $router->get('/api/db-status', function() use ($pdo) {

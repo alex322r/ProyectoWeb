@@ -1,0 +1,434 @@
+/* =============================
+   PALETA DE COLORES Y VARIABLES
+============================= */
+:root {
+  --bg: #F7F9FC;
+  --sidebar-bg: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --text-primary: #0D47A1;
+  --text-secondary: #424242;
+  --muted-text: #757575;
+  --border: #D1E3F8;
+  --accent: #1976D2;
+  --accent-hover: #1565C0;
+  --accent-text: #FFFFFF;
+  --status-confirmed: #4CAF50;
+  --status-pending: #FB8C00;
+  --status-attended: #1976D2;
+  --danger-bg: #FFEBEE;
+  --danger-border: #E57373;
+  --radius: 8px;
+  --shadow: 0 4px 12px rgba(0, 80, 150, 0.08);
+}
+
+/* =============================
+   RESETEO Y ESTILOS BASE
+============================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text-secondary); font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
+
+/* =============================
+   ESTRUCTURA PRINCIPAL
+============================= */
+.app { display: flex; width: 100%; height: 100%; }
+.sidebar { width: 250px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px; flex-shrink: 0; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* =============================
+   SIDEBAR
+============================= */
+.brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; margin-bottom: 24px; }
+.brand h1 { font-size: 20px; color: var(--text-primary); font-weight: 700; }
+.brand-subtitle { font-size: 12px; color: var(--muted-text); }
+.logo {
+  width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), #42A5F5); border-radius: 50%;
+  display: flex; justify-content: center; align-items: center; color: var(--accent-text); font-weight: 700; flex-shrink: 0;
+  /* TRANSICIÓN #1: Suaviza la transformación del logo al pasar el cursor */
+  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+.brand:hover .logo {
+  /* TRANSFORMACIÓN #1: Combinación de rotación y escala */
+  transform: rotate(360deg) scale(1.1);
+}
+
+.nav { flex: 1; margin-top: 16px; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--radius);
+  color: var(--muted-text); margin-bottom: 8px; cursor: pointer; font-weight: 500;
+  /* TRANSICIÓN #2: Propiedades específicas (background-color, color) */
+  transition-property: background-color, color;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+.nav-item:hover { background: #2f9dec; color: white; }
+.nav-item.active { background: var(--accent); color: var(--accent-text); font-weight: 600; }
+.nav-icon { font-size: 18px; transition: transform 0.2s ease-out; }
+.nav-item:hover .nav-icon { transform: scale(1.4); }
+.sidebar-footer { font-size: 12px; text-align: center; color: var(--muted-text); padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* =============================
+   ÁREA PRINCIPAL
+============================= */
+.topbar { background: var(--sidebar-bg); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 16px 28px; flex-shrink: 0; }
+.page-title h2 { color: var(--text-primary); font-size: 22px; }
+.page-title span { font-size: 13px; color: var(--muted-text); }
+.userbox { display: flex; align-items: center; gap: 12px; }
+.user-info { text-align: right; }
+.user-name { font-weight: 600; color: var(--text-secondary); }
+.user-role { font-size: 12px; color: var(--muted-text); }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #42A5F5); color: var(--accent-text); display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.content { position: relative; flex: 1; padding: 28px; overflow-y: auto; }
+
+/* Vistas y Tarjetas */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.5s ease-out forwards; }
+.card {
+  background: var(--card-bg); padding: 24px; border-radius: var(--radius);
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  /* TRANSICIÓN #3: Múltiples propiedades con delays y timings distintos */
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.4s ease 0.1s;
+}
+.card:hover {
+  border-color: var(--accent);
+  /* TRANSFORMACIÓN #2: Transformación 3D para efecto de profundidad */
+  transform: translateY(-5px) perspective(1000px) rotateX(0deg);
+  box-shadow: 0 10px 20px rgba(14, 235, 69, 0.15);
+}
+
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.card h3, .view-header h3 { color: var(--text-primary); margin: 0; }
+.view-header p, .muted-text { color: var(--muted-text); font-size: 14px; margin-top: 4px; }
+.grid { display: grid; gap: 24px; margin-bottom: 24px; }
+.kpi-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.main-grid { grid-template-columns: 2fr 1fr; }
+.actions-notifications { display: flex; flex-direction: column; gap: 24px; }
+
+/* Elementos Dashboard */
+.kpi .label { font-size: 14px; color: var(--muted-text); }
+.kpi .value { font-size: 28px; font-weight: 700; color: var(--text-primary); margin-top: 4px; }
+.kpi-icon { font-size: 28px; opacity: 0.7; transition: transform 0.3s ease; }
+.card:hover .kpi-icon {
+  /* TRANSFORMACIÓN #3: Transformación 2D Skew */
+  transform: skewX(-5deg);
+}
+.quick-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.notifications { color: var(--muted-text); font-size: 14px; margin-top: 16px; }
+
+/* Header de Vistas */
+.view-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.header-actions { display: flex; gap: 12px; align-items: center; }
+
+/* Formularios */
+input {
+  padding: 8px 12px; border-radius: var(--radius); border: 1px solid var(--border);
+  background-color: #ffffff; color: var(--text-secondary); min-width: 200px;
+  /* TRANSICIÓN #4: Anima el ancho del input al enfocarlo */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, min-width 0.3s ease;
+}
+input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+  outline: none;
+  min-width: 260px; /* Se expande al hacer foco */
+}
+
+/* Botones */
+.btn {
+  background: var(--accent); color: var(--accent-text); padding: 9px 16px;
+  border-radius: var(--radius); border: 1px solid var(--accent); cursor: pointer;
+  font-weight: 500; font-size: 14px;
+  transition: all 0.2s ease;
+}
+.btn:hover {
+  background: var(--accent-hover); border-color: var(--accent-hover);
+  transform: translateY(-2px); box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.btn:active { transform: translateY(0) scale(0.98); }
+.btn.ghost { background: transparent; border-color: var(--border); color: var(--accent); }
+.btn.ghost:hover { background: #fdefe3; border-color: var(--accent); }
+
+/* Tablas */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 16px; border-bottom: 1px solid var(--border); text-align: left; }
+th { background: #e0e0f3; color:#0D47A1; font-size: 12px; text-transform: uppercase; font-weight: 600; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { transition: background-color 0.2s ease; }
+tbody tr:hover { background-color: #F0F6FC; }
+.status { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; color: #fff; }
+.status.confirmed { background-color: var(--status-confirmed); }
+.status.pending { background-color: var(--status-pending); }
+.status.attended { background-color: var(--status-attended); }
+
+/* =============================
+   ANIMACIONES CON @keyframes
+============================= */
+
+/* ANIMACIÓN #1 (Existente): Entrada de vistas */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ANIMACIÓN #2: Bucle infinito para notificaciones */
+.notification-dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--danger-border);
+  border-radius: 50%;
+  animation-name: pulse;
+  animation-duration: 1.5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 115, 115, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(229, 115, 115, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 115, 115, 0); }
+}
+
+/* ANIMACIÓN #3: Animación interactiva para errores */
+.shake-error {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  border-color: var(--danger-border);
+  background-color: var(--danger-bg);
+}
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* ANIMACIÓN #4 (Extra): Rotación contínua para un ícono */
+.icon-config {
+    animation: spin 8s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+/* CÓDIGO PARA AGREGAR AL FINAL DE styles.css */
+
+/* =============================
+   ESTILOS PARA LA VENTANA MODAL
+============================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  padding: 28px;
+  border-radius: var(--radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 700px;
+  position: relative;
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay:not(.hidden) .modal-content {
+    transform: scale(1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--muted-text);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.modal-close:hover {
+  color: var(--text-secondary);
+}
+
+.modal-content h2 {
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.profile-layout {
+  display: flex;
+  gap: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+}
+
+.profile-photo {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  background-color: #E0E0E0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--muted-text);
+  font-weight: 500;
+}
+
+.profile-info {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.info-item label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted-text);
+  margin-bottom: 4px;
+}
+
+.info-item span {
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.profile-history h3 {
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.history-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background-color: var(--bg);
+}
+
+.history-list-item:nth-child(even) {
+    background-color: #F0F6FC;
+}
+
+.history-list-item .btn {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.hidden {
+  display: none;
+}
+/* CÓDIGO PARA AGREGAR AL FINAL DE styles.css */
+
+/* =============================
+   ESTILOS ESPECÍFICOS DEL FORMULARIO DE CITA
+============================= */
+.appointment-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas por defecto */
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background-color: #FFF;
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  /* Transición para inputs y selects */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+  outline: none;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1; /* Ocupa todas las columnas */
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end; /* Alinea los botones a la derecha */
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* Responsividad básica para el formulario de cita */
+@media (max-width: 600px) {
+  .appointment-form-grid {
+    grid-template-columns: 1fr; /* Una columna en pantallas pequeñas */
+  }
+}
+
+.patient-form-flex {
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+  align-items: start;
+  margin-bottom: 24px;
+
+  & > .form-group {
+
+    flex: 1;
+    min-width: 200px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    & label {
+      margin-bottom: 6px;
+    }
+    & input {
+      width: 100%;
+      max-width: 800px;
+    }
+  }
+
+  
+}
