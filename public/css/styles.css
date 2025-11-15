@@ -70,6 +70,7 @@ body { background: var(--bg); color: var(--text-secondary); font-family: 'Inter'
    ÁREA PRINCIPAL
 ============================= */
 .topbar { background: var(--sidebar-bg); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 16px 28px; flex-shrink: 0; }
+.topbar-left { display: flex; align-items: center; gap: 16px; }
 .page-title h2 { color: var(--text-primary); font-size: 22px; }
 .page-title span { font-size: 13px; color: var(--muted-text); }
 .userbox { display: flex; align-items: center; gap: 12px; }
@@ -159,6 +160,12 @@ tbody tr:hover { background-color: #F0F6FC; }
 .status.confirmed { background-color: var(--status-confirmed); }
 .status.pending { background-color: var(--status-pending); }
 .status.attended { background-color: var(--status-attended); }
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
 /* =============================
    ANIMACIONES CON @keyframes
@@ -431,4 +438,167 @@ tbody tr:hover { background-color: #F0F6FC; }
   }
 
   
+}
+
+/* Estilos para el dialog de error */
+#errorDialog {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  background-color: var(--card-bg);
+  max-width: 400px;
+  text-align: center;
+  position: fixed; /* Asegura que se posicione respecto al viewport */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centra el dialog */
+  z-index: 1001; /* Asegura que esté por encima de otros elementos */
+}
+
+#errorDialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#errorDialog p {
+  color: var(--danger-border);
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+#errorDialog button {
+  background-color: var(--danger-border);
+  color: var(--accent-text);
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+#errorDialog button:hover {
+  background-color: #C62828; /* Un rojo más oscuro al pasar el ratón */
+}
+
+/* Estilos para el dialog de perfil de empleado */
+#profileDialog {
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    background-color: var(--card-bg);
+    max-width: 500px; /* Ajusta el ancho máximo según sea necesario */
+    width: 90%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    display: none; /* Oculto por defecto, se muestra con showModal() */
+}
+
+#profileDialog[open] {
+    display: block; /* Se muestra cuando el atributo 'open' está presente */
+}
+
+#profileDialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#profileDialog h2 {
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#profileContent p {
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+#profileContent p strong {
+    color: var(--text-primary);
+    display: inline-block;
+    width: 150px; /* Alinea las etiquetas */
+}
+
+#profileDialog #closeProfileBtn {
+    display: block;
+    margin: 20px auto 0;
+    background-color: var(--accent);
+    color: var(--accent-text);
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+#profileDialog #closeProfileBtn:hover {
+    background-color: var(--accent-hover);
+}
+
+/* =============================
+   ESTILOS PARA EL RELOJ
+============================= */
+.live-clock {
+  font-size: 14px;
+  color: var(--muted-text);
+  font-weight: 500;
+  text-align: right;
+}
+
+.logout-button {
+  background-color: var(--danger-bg);
+  color: var(--danger-border);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  border: 1px solid var(--danger-border);
+}
+
+.logout-button:hover {
+  background-color: var(--danger-border);
+  color: var(--accent-text);
+}
+
+/* Submenu styles */
+.nav-item.has-submenu {
+    position: relative;
+}
+
+.nav-item.has-submenu > a {
+    display: block;
+    width: 100%;
+}
+
+.submenu {
+    display: none;
+    list-style: none;
+    padding-left: 20px;
+    margin-top: 8px;
+}
+
+.nav-item.has-submenu.active .submenu {
+    display: block;
+}
+
+.submenu li a {
+    display: block;
+    padding: 8px 10px;
+    color: var(--muted-text);
+    text-decoration: none;
+    border-radius: var(--radius);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.submenu li a:hover {
+    background-color: #2f9dec;
+    color: white;
 }

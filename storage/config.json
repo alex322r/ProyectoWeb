@@ -1,0 +1,15 @@
+{
+    "timezone": "UTC",
+    "features": {
+        "allow_new_user_registration": true
+    },
+    "views": {
+        "pacientes": true,
+        "empleados": true,
+        "agenda": true,
+        "citas": true,
+        "registros": true,
+        "backup": true,
+        "planes": true
+    }
+}

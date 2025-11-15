@@ -1,100 +1,132 @@
-
-/* 1. Estilos para el Diálogo */
-#registerDialog {
-    margin: auto;
+/* Estilos para el diálogo de perfil de paciente */
+#profileDialog {
     width: 90%;
     max-width: 600px;
-    border: none;
+    border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    padding: 1.5rem;
+    padding: 0;
+    overflow: hidden; /* Para que los bordes redondeados afecten a los hijos */
 }
 
-/* 2. Estilo para el fondo oscuro (backdrop) */
-#registerDialog::backdrop {
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(2px); /* Efecto borroso (opcional) */
+#profileDialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
 }
 
-/* 3. Estilos del Formulario Interno */
-#registerForm {
+.profile-container {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem; /* Espacio entre secciones */
 }
 
-fieldset {
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem; /* Espacio entre labels/inputs */
+/* Encabezado del Perfil */
+.profile-header {
+    background-color: #f7f7f7;
+    padding: 16px 24px;
+    border-bottom: 1px solid #eee;
+    position: relative;
 }
 
-legend {
-    font-weight: bold;
-    padding: 0 0.5rem;
+.profile-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
 }
 
-label {
-    font-weight: 500;
+.profile-header p {
+    margin: 4px 0 0;
+    color: #666;
+    font-size: 0.9rem;
 }
 
-input[type="text"],
-input[type="email"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box; /* Para que el padding no afecte el ancho */
-    border: 1px solid #ddd;
-    border-radius: 4px;
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #888;
+    padding: 5px;
+    line-height: 1;
 }
 
-.input-with-button {
-    display: flex;
-    gap: 0.5rem;
+.close-button:hover {
+    color: #333;
 }
 
-.input-with-button input {
-    flex-grow: 1; /* El input toma el espacio disponible */
+/* Cuerpo del Perfil */
+.profile-body {
+    padding: 24px;
+    line-height: 1.6;
 }
 
-/* 4. Estilos para los botones de opción */
-.radio-group {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 0.5rem 0;
+.profile-section {
+    margin-bottom: 24px;
 }
 
-/* 5. Clase de utilidad para ocultar */
-.hidden {
-    display: none;
+.profile-section:last-child {
+    margin-bottom: 0;
 }
 
-/* 6. Botones de acción (Guardar/Cancelar) */
-.form-actions {
+.profile-section h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+    color: #444;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.profile-section p {
+    margin: 8px 0;
+    color: #555;
+}
+
+.profile-section p strong {
+    color: #333;
+    margin-right: 8px;
+}
+
+/* Badge de Estado */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.status-en-tratamiento {
+    background-color: #3498db; /* Azul */
+}
+
+.status-alta {
+    background-color: #2ecc71; /* Verde */
+}
+
+.status-inactivo {
+    background-color: #95a5a6; /* Gris */
+}
+
+/* Pie de página del Perfil */
+.profile-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 12px;
+    padding: 16px 24px;
+    background-color: #f7f7f7;
+    border-top: 1px solid #eee;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
+.estado-activo {
+    color: green;
+    font-weight: bold;
 }
 
-button[type="submit"] {
-    background-color: #007bff;
-    color: white;
-}
-
-#cancelBtn {
-    background-color: #f1f1f1;
-    color: #333;
+.estado-inactivo {
+    color: red;
+    font-weight: bold;
 }

@@ -1,0 +1,6 @@
+CREATE TABLE intentos_login_fallidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR(50) NOT NULL,
+    ip VARCHAR(45) NOT NULL,
+    fecha_intento DATETIME DEFAULT CURRENT_TIMESTAMP
+);

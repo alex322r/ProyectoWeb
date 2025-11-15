@@ -1,0 +1,1 @@
+ALTER TABLE empleado ADD COLUMN estado VARCHAR(255) NOT NULL DEFAULT 'activo';

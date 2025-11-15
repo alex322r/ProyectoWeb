@@ -50,14 +50,22 @@ class AuthController
 
         // 4. Verificar si el usuario existe Y la contraseña es correcta
         if ($user && password_verify($clave, $user['clave'])) {
-            // ¡Éxito! Reseteamos los intentos fallidos y la fecha de bloqueo
+            // ¡Éxito! Ahora verificamos si el usuario está activo
+            if ($user['estado'] === 'inactivo') {
+                // Usuario inactivo, no puede iniciar sesión
+                header('Location: /inactive-account');
+                exit;
+            }
+
+            // Reseteamos los intentos fallidos y la fecha de bloqueo
             $stmt = $this->pdo->prepare("UPDATE empleado SET intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id_empleado = ?");
             $stmt->execute([$user['id_empleado']]);
 
             // Guardamos al usuario en la sesión
-            session_regenerate_id(true); // Seguridad contra fijación de sesión
             $_SESSION['user_id'] = $user['id_empleado'];
             $_SESSION['user_email'] = $user['usuario'];
+            $_SESSION['user_role'] = $user['rol'];
+            session_regenerate_id(true); // Seguridad contra fijación de sesión
 
             // Redirigimos al dashboard
             header('Location: /dashboard');
@@ -65,6 +73,9 @@ class AuthController
 
         } else {
             // Error, credenciales incorrectas
+            $ip = $_SERVER['REMOTE_ADDR'];
+            $stmt = $this->pdo->prepare("INSERT INTO intentos_login_fallidos (usuario, ip) VALUES (?, ?)");
+            $stmt->execute([$usuario, $ip]);
             if ($user) {
                 $intentos_fallidos = $user['intentos_fallidos'] + 1;
 
@@ -94,5 +105,18 @@ class AuthController
         session_destroy();
         header('Location: /login');
         exit;
+    }
+
+    public function getFailedLoginAttempts()
+    {
+        try {
+            $stmt = $this->pdo->query("SELECT usuario, ip, fecha_intento FROM intentos_login_fallidos ORDER BY fecha_intento DESC LIMIT 20");
+            $attempts = $stmt->fetchAll();
+            header('Content-Type: application/json');
+            echo json_encode($attempts);
+        } catch (Exception $e) {
+            header('Content-Type: application/json', true, 500);
+            echo json_encode(['error' => 'Could not get failed login attempts', 'details' => $e->getMessage()]);
+        }
     }
 }

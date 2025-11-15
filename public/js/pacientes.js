@@ -1,5 +1,3 @@
-console.log("pacientes")
-
 document.addEventListener("DOMContentLoaded", () => {
 
 
@@ -91,42 +89,167 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
-  // Manejar el envío del formulario
-  form.addEventListener("submit", (event) => {
-    event.preventDefault(); // ¡MUY IMPORTANTE! Evita que la página se recargue
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-    // 1. Crear un objeto con los datos
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
-    console.log("Datos a enviar:", data);
+    try {
+      const response = await fetch('/pacientes/crear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
 
-    // 2. Aquí llamarías a tu backend (Paso 1, 2 y 3 de nuestra conversación anterior)
-    // Ejemplo de la lógica que ejecutarías:
+      const result = await response.json();
 
-    // PASO 1: Crear/obtener Persona-Paciente
-    // const idPersonaPaciente = await crearPersona(data.paciente_dni, data.paciente_nombres...);
+      if (result.success) {
+        alert("¡Paciente registrado con éxito!");
+        dialog.close();
+        form.reset();
+        // Aquí podrías agregar una función para recargar la lista de pacientes
+      } else {
+        alert("Error al registrar el paciente: " + result.message);
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      alert("Ocurrió un error de red. Inténtalo de nuevo.");
+    }
+  });  const searchInput = document.getElementById("buscarPaciente");
+  const patientsTable = document.getElementById("patientsTable");
 
-    // PASO 2: Crear/obtener Cliente
-    let idCliente;
-    // if (data.billingType === "same") {
-    //     idCliente = await crearClienteNatural(idPersonaPaciente);
-    // } else if (data.billingType === "other") {
-    //     const idPersonaCliente = await crearPersona(data.cliente_dni, data.cliente_nombres...);
-    //     idCliente = await crearClienteNatural(idPersonaCliente);
-    // } else if (data.billingType === "company") {
-    //     idCliente = await crearClienteJuridico(data.cliente_ruc, data.cliente_razon_social);
-    // }
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  };
 
-    // PASO 3: Crear Paciente
-    // await crearPaciente(idPersonaPaciente, idCliente);
+  const renderTable = (pacientes) => {
+    patientsTable.innerHTML = ''; // Limpiar la tabla
 
-    // 3. Simular éxito
-    alert("¡Paciente registrado con éxito!");
+    if (pacientes.length === 0) {
+      patientsTable.innerHTML = '<tr><td colspan="6">No se encontraron pacientes.</td></tr>';
+      return;
+    }
 
-    // 4. Cerrar el modal y limpiar
-    dialog.close();
-    form.reset();
+    pacientes.forEach(paciente => {
+      const row = `
+        <tr>
+          <td>${paciente.id_paciente}</td>
+          <td>${paciente.nombres} ${paciente.apellidos}</td>
+          <td>${paciente.dni}</td>
+          <td>-</td>
+          <td>${paciente.ultima_cita || '-'}</td>
+          <td><button class="btn ghost" onclick="viewProfile(${paciente.id_paciente})">Ver Perfil</button></td>
+        </tr>
+      `;
+      patientsTable.innerHTML += row;
+    });
+  };
+
+  const search = async (searchTerm) => {
+    try {
+      const response = await fetch(`/pacientes/buscar?term=${encodeURIComponent(searchTerm)}`);
+      const pacientes = await response.json();
+      renderTable(pacientes);
+    } catch (error) {
+      console.error('Error en la búsqueda:', error);
+      patientsTable.innerHTML = '<tr><td colspan="6">Error al cargar los datos.</td></tr>';
+    }
+  };
+
+  const debouncedSearch = debounce(search, 300);
+
+  searchInput.addEventListener("input", (event) => {
+    debouncedSearch(event.target.value);
   });
 
+  // --- Lógica para el Perfil del Paciente ---
+  const profileDialog = document.getElementById("profileDialog");
+  const closeProfileBtn = document.getElementById("closeProfileBtn");
+
+  const populateProfile = (data) => {
+    document.getElementById("profile-id_paciente").textContent = data.id_paciente;
+    document.getElementById("profile-nombre_completo").textContent = data.nombre_completo;
+    document.getElementById("profile-dni").textContent = data.dni;
+    document.getElementById("profile-email").textContent = data.email;
+    
+    const estadoBadge = document.getElementById("profile-estado");
+    estadoBadge.textContent = data.estado;
+    estadoBadge.className = `status-badge status-${data.estado.toLowerCase().replace(' ', '-')}`;
+
+    const facturacionDiv = document.getElementById("profile-facturacion");
+    let facturacionHTML = `<p><strong>Tipo:</strong> ${data.facturacion.tipo}</p>`;
+    if (data.facturacion.tipo === 'Otro responsable') {
+      facturacionHTML += `<p><strong>Nombre:</strong> ${data.facturacion.nombre}</p>`;
+      facturacionHTML += `<p><strong>DNI:</strong> ${data.facturacion.dni}</p>`;
+    } else if (data.facturacion.tipo === 'Empresa') {
+      facturacionHTML += `<p><strong>Razón Social:</strong> ${data.facturacion.razon_social}</p>`;
+      facturacionHTML += `<p><strong>RUC:</strong> ${data.facturacion.ruc}</p>`;
+    }
+    facturacionDiv.innerHTML = facturacionHTML;
+  };
+
+  window.viewProfile = async (id) => {
+    try {
+      const response = await fetch(`/pacientes/ver/${id}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+
+      if (result.success) {
+        populateProfile(result.data);
+        profileDialog.showModal();
+      } else {
+        alert("Error al cargar el perfil: " + result.message);
+      }
+    } catch (error) {
+      console.error('Error al obtener el perfil del paciente:', error);
+      alert("No se pudo cargar el perfil del paciente.");
+    }
+  };
+
+  // Cerrar el diálogo de perfil
+  closeProfileBtn.addEventListener("click", () => profileDialog.close());
+
+  profileDialog.addEventListener("click", (event) => {
+    if (event.target === profileDialog) {
+      profileDialog.close();
+    }
+  });
+
+  window.deletePatient = async (id) => {
+    if (!confirm(`¿Estás seguro de que quieres eliminar al paciente con ID ${id}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/pacientes/eliminar/${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Paciente eliminado con éxito.");
+        window.location.reload();
+      } else {
+        alert("Error al eliminar el paciente: " + result.message);
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      alert("Ocurrió un error de red. Inténtalo de nuevo.");
+    }
+  };
 });

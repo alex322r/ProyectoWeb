@@ -5,8 +5,18 @@
     exit;
   }
 
-  $userName = $_SESSION['user_name'] ?? 'Usuario';
+  $userName = $_SESSION['user_email'] ?? 'Usuario';
   $userRole = $_SESSION['user_role'] ?? 'Rol';
+
+  $config_file = __DIR__ . '/../storage/config.json';
+  $views_config = [];
+  if (file_exists($config_file)) {
+      $config_content = file_get_contents($config_file);
+      $config = json_decode($config_content, true);
+      if (isset($config['views'])) {
+          $views_config = $config['views'];
+      }
+  }
 
 ?>
 
@@ -35,18 +45,52 @@
       </div>
 
       <nav class="nav" id="menu">
-        <div class="nav-item active" data-target="dashboard"><a href="/dashboard">📊 Dashboard</a></div>
-        <div class="nav-item" data-target="pacientes"><a href="/pacientes">👥 Pacientes</a></div>
-        <div class="nav-item" data-target="agenda"><a href="/agenda">📅 Agenda</a></div>
-        </nav>
+
+        <?php if ( $userRole === 'recepcionista'): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'dashboard' ? 'active' : ''; ?>" data-target="dashboard"><a href="/dashboard">📊 Dashboard</a></div>
+          <?php if ($views_config['pacientes']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'pacientes' ? 'active' : ''; ?>" data-target="pacientes"><a href="/pacientes">👥 Pacientes</a></div>
+          <?php endif; ?>
+          <?php if ($views_config['agenda']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'agenda' ? 'active' : ''; ?>" data-target="agenda"><a href="/agenda">📅 Agenda</a></div>
+          <?php endif; ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'reportes' ? 'active' : ''; ?>" data-target="reportes"><a href="/reportes/pacientes">📊 Reportes</a></div>
+        <?php endif; ?>
+        <?php if ( $userRole === 'administrador'): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'dashboard' ? 'active' : ''; ?>" data-target="dashboard"><a href="/dashboard">📊 Dashboard</a></div>
+          <?php if ($views_config['empleados']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'empleados' ? 'active' : ''; ?>" data-target="empleados"><a href="/empleados">Empleados</a></div>
+          <?php endif; ?>
+          <?php if ($views_config['planes']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'planes' ? 'active' : ''; ?>" data-target="planes"><a href="/planes">Planes</a></div>
+          <?php endif; ?>
+          <?php if ($views_config['registros']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'registros' ? 'active' : ''; ?>" data-target="registros"><a href="/registros">Registros</a></div>
+          <?php endif; ?>
+          <?php if ($views_config['backup']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'backup' ? 'active' : ''; ?>" data-target="backup"><a href="/backup">Copias de Seguridad</a></div>
+          <?php endif; ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'configuracion' ? 'active' : ''; ?>" data-target="configuracion"><a href="/configuracion">Configuración</a></div>
+
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'reportes' ? 'active' : ''; ?>" data-target="reportes"><a href="/reportes">Reportes</a></div>
+ 
+       <?php endif; ?>
+
+      </nav>
 
       <div class="sidebar-footer">© 2025 Avance • Sistema</div>
     </aside>
 
     <main class="main" role="main">
       <header class="topbar">
-        <div class="user-name"><?php /* echo htmlspecialchars($userName); */ ?></div>
-        <div class="user-role"><?php /* echo htmlspecialchars($userRole); */ ?></div>
+        <div class="topbar-left">
+          <div class="user-info">
+              <div class="user-name"><?php echo htmlspecialchars($userName); ?></div>
+              <div class="user-role"><?php echo htmlspecialchars($userRole); ?></div>
+          </div>
+          <a href="/logout" class="logout-button">Cerrar Sesión</a>
+        </div>
+        <div id="live-clock" class="live-clock" data-server-time="<?php echo time() * 1000; ?>"></div>
       </header>
 
       <section class="content">
@@ -63,7 +107,28 @@
 
   <div id="newPatientModal" class="modal-overlay hidden">
      </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const clockElement = document.getElementById('live-clock');
+      const serverTime = parseInt(clockElement.getAttribute('data-server-time'), 10);
+      let serverTimeObj = new Date(serverTime);
 
-  <script src="/js/pacientes.js"></script>
+      function updateClock() {
+        // Increment seconds
+        serverTimeObj.setSeconds(serverTimeObj.getSeconds() + 1);
+
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        const formattedDateTime = serverTimeObj.toLocaleDateString('es-ES', options);
+        
+        clockElement.textContent = formattedDateTime;
+      }
+
+      // Update the clock every second
+      setInterval(updateClock, 1000);
+      
+      // Initial call to display the clock immediately
+      updateClock();
+    });
+  </script>
 </body>
 </html>

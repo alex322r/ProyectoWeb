@@ -14,22 +14,25 @@
             <table>
               <thead><tr><th>#</th><th>Nombre completo</th><th>DNI</th><th>Plan</th><th>Últ. cita</th><th>Acciones</th></tr></thead>
               <tbody id="patientsTable">
-                <tr>
-                  <td>1</td>
-                  <td>Alexis Rodriguez</td>
-                  <td>87654321</td>
-                  <td>Plan 10 sesiones</td>
-                  <td>2025-10-02</td>
-                  <td><button class="btn ghost" onclick="viewProfile(1)">Ver Perfil</button></td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>William Ríos</td>
-                  <td>71234567</td>
-                  <td>-</td>
-                  <td>2025-09-28</td>
-                  <td><button class="btn ghost" onclick="viewProfile(2)">Ver Perfil</button></td>
-                </tr>
+                <?php if (isset($pacientes) && !empty($pacientes)): ?>
+                  <?php foreach ($pacientes as $paciente): ?>
+                    <tr>
+                      <td><?php echo htmlspecialchars($paciente['id_paciente']); ?></td>
+                      <td><?php echo htmlspecialchars($paciente['nombres'] . ' ' . $paciente['apellidos']); ?></td>
+                      <td><?php echo htmlspecialchars($paciente['dni']); ?></td>
+                      <td>-</td>
+                      <td><?php echo htmlspecialchars($paciente['ultima_cita'] ? $paciente['ultima_cita'] : '-'); ?></td>
+                  <td>
+                        <button class="btn ghost" onclick="viewProfile(<?php echo htmlspecialchars($paciente['id_paciente']); ?>)">Ver Perfil</button>
+                        <button class="btn btn-danger" onclick="deletePatient(<?php echo htmlspecialchars($paciente['id_paciente']); ?>)">Eliminar</button>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <tr>
+                    <td colspan="6">No hay pacientes registrados.</td>
+                  </tr>
+                <?php endif; ?>
               </tbody>
             </table>
           </div>
@@ -94,4 +97,38 @@
             </div>
         </form>
     </dialog>
+    <script>
+      console.log("Hola desde pacientes.php");  
+    </script>
 <script src="js/pacientes.js" type="module"></script>
+
+<dialog id="profileDialog">
+    <div class="profile-container">
+        <header class="profile-header">
+            <h2 id="profile-nombre_completo">Nombre del Paciente</h2>
+            <p>ID de Paciente: <span id="profile-id_paciente"></span></p>
+            <button id="closeProfileBtn" class="close-button" aria-label="Cerrar">&times;</button>
+        </header>
+
+        <div class="profile-body">
+            <div class="profile-section">
+                <h3>Datos Personales</h3>
+                <p><strong>DNI:</strong> <span id="profile-dni"></span></p>
+                <p><strong>Email:</strong> <span id="profile-email"></span></p>
+                <p><strong>Estado:</strong> <span id="profile-estado" class="status-badge"></span></p>
+            </div>
+
+            <div class="profile-section">
+                <h3>Información de Facturación</h3>
+                <div id="profile-facturacion">
+                    <!-- El contenido se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <footer class="profile-footer">
+            <button id="editProfileBtn" class="btn">Editar</button>
+            <button id="viewHistoryBtn" class="btn ghost">Ver Historial</button>
+        </footer>
+    </div>
+</dialog>
