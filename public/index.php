@@ -71,6 +71,9 @@ use App\Controllers\ConfiguracionController;
 use App\Controllers\BackupController;
 use App\Controllers\ReportesController;
 use App\Controllers\PlanesController;
+use App\Controllers\AgendaController;
+use App\Controllers\HistorialController;
+use App\Controllers\PagoController;
 
 $dsn = 'mysql:host=127.0.0.1;dbname=consultorio_psicologico';
 $usuario = 'root';
@@ -106,6 +109,9 @@ $configuracionController = new ConfiguracionController($pdo);
 $backupController = new BackupController($pdo);
 $reportesController = new ReportesController($pdo);
 $planesController = new PlanesController($pdo);
+$agendaController = new AgendaController($pdo);
+$historialController = new HistorialController($pdo);
+$pagoController = new PagoController($pdo);
 
 // --- RUTAS PÚBLICAS (No requieren login) ---
 $router->before('GET', '/login', function() {
@@ -139,7 +145,7 @@ $router->get('/reportes/pacientes', function() use ($reportesController) {
     view('reportes_pacientes', $data);
 });
 
-$router->before('GET|POST', '/(dashboard|pacientes|pacientes/delete|agenda|pagos|planes|empleados|reportes|config|backup|api/.*|home)', function() use ($pdo) {
+$router->before('GET|POST', '/(dashboard|pacientes|pacientes/delete|agenda|pagos|planes|empleados|reportes|config|backup|api/.*|home|historial/.*)', function() use ($pdo) {
     // Si la variable de sesión 'user_id' no existe, lo botamos al login
     if (!isset($_SESSION['user_id'])) {
         header('Location: /login');
@@ -161,6 +167,12 @@ $router->before('GET|POST', '/(dashboard|pacientes|pacientes/delete|agenda|pagos
 $router->get('/dashboard', function() use ($dashboardController) {
     $data = $dashboardController->getDashboardData();
     view('dashboard', $data);
+});
+
+$router->get('/pagos', [$pagoController, 'index']);
+
+$router->get('/historial/buscar', function() use ($historialController) {
+    $historialController->index();
 });
 
 
@@ -284,7 +296,7 @@ if ($views_config['pacientes']) {
         $pacienteController->crear();
     });
 
-    $router->get('/pacientes/buscar', function() use ($pacienteController) {
+    $router->get('/api/pacientes/buscar', function() use ($pacienteController) {
         $pacienteController->buscar();
     });
 
@@ -292,23 +304,77 @@ if ($views_config['pacientes']) {
         $pacienteController->ver($id);
     });
 
+    $router->before('GET', '/pacientes/expediente/(\d+)', function() {
+        if (!isset($_SESSION['user_role']) || ($_SESSION['user_role'] !== 'psicologo' && $_SESSION['user_role'] !== 'administrador')) {
+            header('Location: /dashboard');
+            exit();
+        }
+    });
+    $router->get('/pacientes/expediente/(\d+)', function($id) use ($pacienteController) {
+        $pacienteController->verExpediente($id);
+    });
+
+    $router->post('/pacientes/expediente/(\d+)', function($id) use ($pacienteController) {
+        $pacienteController->guardarExpediente($id);
+    });
+
+    $router->post('/pacientes/actualizarEstado', function() use ($pacienteController) {
+        $pacienteController->actualizarEstado();
+    });
+
+    $router->post('/pacientes/eliminar/(\d+)', function($id) use ($pacienteController) {
+        $pacienteController->eliminar($id);
+    });
+
 }
 
 
 if ($views_config['citas']) {
-    $router->get('citas', function() use ($pdo) {
-        view('citas', [
-            'titulo' => 'Citas',
-            'ingresosDia' => 1220, // Dato de ejemplo
-            'paginaActiva' => 'citas'
-        ]);
+    $router->get('/citas', [$agendaController, 'citas']);
+}
+
+if ($views_config['agenda']) {
+    $router->get('/agenda', function() use ($agendaController) {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'psicologo') {
+            header('Location: /dashboard');
+            exit();
+        }
+        $agendaController->index();
+    });
+    $router->get('/api/citas', function() use ($agendaController) {
+        $agendaController->getAppointments();
+    });
+    $router->post('/api/citas/create', function() use ($agendaController) {
+        $agendaController->create();
+    });
+    $router->post('/api/citas/update/(\d+)', function($id) use ($agendaController) {
+        $agendaController->update($id);
+    });
+    $router->post('/api/citas/cancel/(\d+)', function($id) use ($agendaController) {
+        $agendaController->cancel($id);
+    });
+    $router->post('/api/citas/delete/(\d+)', function($id) use ($agendaController) {
+        $agendaController->delete($id);
+    });
+    $router->get('/api/citas/(\d+)', function($id) use ($agendaController) {
+        $agendaController->get($id);
     });
 }
 
 $router->get('/api/empleados/online', [$empleadoController, 'getOnlineUsers']);
 $router->get('/api/system-status', [$monitorController, 'getSystemStatus']);
 $router->get('/api/empleados/nuevos', [$empleadoController, 'getNewUsers']);
+$router->get('/api/empleados/listar/psicologo', [$empleadoController, 'listarPsicologos']);
 $router->get('/api/auth/failed-logins', [$authController, 'getFailedLoginAttempts']);
+$router->get('/api/pagos/deudas/(\d+)', function($id) use ($pagoController) {
+    $pagoController->getDeudas($id);
+});
+$router->post('/api/pagos/crear', function() use ($pagoController) {
+    $pagoController->crear();
+});
+$router->post('/api/pagos/registrar', function() use ($pagoController) {
+    $pagoController->registrarPago();
+});
 
 $router->run(function() use ($pdo) {
     try {

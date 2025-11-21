@@ -218,4 +218,16 @@ class EmpleadoController {
             exit;
         }
     }
+
+    public function listarPsicologos() {
+        header('Content-Type: application/json');
+        try {
+            $empleadoModel = new EmpleadoModel($this->pdo);
+            $psicologos = $empleadoModel->listarPsicologos();
+            echo json_encode($psicologos);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => $e->getMessage()]);
+        }
+    }
 }

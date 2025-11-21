@@ -6,13 +6,15 @@
              </div>
             <div class="header-actions">
               <input id="buscarPaciente" type="search" placeholder="Buscar por nombre o DNI" />
+              <?php if (isset($_SESSION['user_role']) && ($_SESSION['user_role'] === 'recepcionista' || $_SESSION['user_role'] === 'administrador')): ?>
               <button id="openRegisterBtn" class="btn">+ Nuevo Paciente</button>
+              <?php endif; ?>
             </div>
           </div>
 
           <div class="table-wrap">
             <table>
-              <thead><tr><th>#</th><th>Nombre completo</th><th>DNI</th><th>Plan</th><th>Últ. cita</th><th>Acciones</th></tr></thead>
+              <thead><tr><th>#</th><th>Nombre completo</th><th>DNI</th><th>Estado</th><th>Últ. cita</th><th>Acciones</th></tr></thead>
               <tbody id="patientsTable">
                 <?php if (isset($pacientes) && !empty($pacientes)): ?>
                   <?php foreach ($pacientes as $paciente): ?>
@@ -20,11 +22,35 @@
                       <td><?php echo htmlspecialchars($paciente['id_paciente']); ?></td>
                       <td><?php echo htmlspecialchars($paciente['nombres'] . ' ' . $paciente['apellidos']); ?></td>
                       <td><?php echo htmlspecialchars($paciente['dni']); ?></td>
-                      <td>-</td>
-                      <td><?php echo htmlspecialchars($paciente['ultima_cita'] ? $paciente['ultima_cita'] : '-'); ?></td>
-                  <td>
+                      <td class="status-cell">
+                          <span class="status-badge status-<?php echo str_replace(' ', '-', htmlspecialchars($paciente['estado'])); ?>">
+                              <?php echo htmlspecialchars($paciente['estado']); ?>
+                          </span>
+                      </td>
+                      <td class="ultima-cita-cell"
+                          data-estado-cita="<?php echo htmlspecialchars($paciente['estado_cita'] ?? ''); ?>"
+                          data-monto-pago="<?php echo htmlspecialchars($paciente['monto_pago'] ?? ''); ?>"
+                          data-estado-pago="<?php echo htmlspecialchars($paciente['estado_pago'] ?? ''); ?>">
+                          <?php echo htmlspecialchars($paciente['ultima_cita'] ? $paciente['ultima_cita'] : '-'); ?>
+                      </td>
+                  <td class="actions-cell">
                         <button class="btn ghost" onclick="viewProfile(<?php echo htmlspecialchars($paciente['id_paciente']); ?>)">Ver Perfil</button>
+                        <?php if (isset($_SESSION['user_role']) && ($_SESSION['user_role'] === 'psicologo' || $_SESSION['user_role'] === 'administrador')): ?>
+                        <a href="/pacientes/expediente/<?php echo htmlspecialchars($paciente['id_paciente']); ?>" class="btn">Ver Expediente</a>
+                        <?php endif; ?>
+                        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'psicologo'): ?>
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle">Cambiar Estado</button>
+                            <div class="dropdown-menu">
+                                <a href="#" class="dropdown-item" data-id="<?php echo htmlspecialchars($paciente['id_paciente']); ?>" data-estado="en tratamiento">En Tratamiento</a>
+                                <a href="#" class="dropdown-item" data-id="<?php echo htmlspecialchars($paciente['id_paciente']); ?>" data-estado="alta">Dar de Alta</a>
+                                <a href="#" class="dropdown-item" data-id="<?php echo htmlspecialchars($paciente['id_paciente']); ?>" data-estado="suspendido">Suspender</a>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+                        <?php if (isset($_SESSION['user_role']) && ($_SESSION['user_role'] === 'administrador' || $_SESSION['user_role'] === 'recepcionista')): ?>
                         <button class="btn btn-danger" onclick="deletePatient(<?php echo htmlspecialchars($paciente['id_paciente']); ?>)">Eliminar</button>
+                        <?php endif; ?>
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -37,6 +63,12 @@
             </table>
           </div>
         </div>
+
+<div id="cita-tooltip" class="hidden">
+    <p><strong>Estado de la cita:</strong> <span id="tooltip-estado-cita"></span></p>
+    <p><strong>Monto del pago:</strong> <span id="tooltip-monto-pago"></span></p>
+    <p><strong>Estado del pago:</strong> <span id="tooltip-estado-pago"></span></p>
+</div>
 
 <dialog id="registerDialog">
         <form id="registerForm">
@@ -94,6 +126,32 @@
             <div class="form-actions">
                 <button type="button" id="cancelBtn">Cancelar</button>
                 <button type="submit">Guardar Paciente</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="editDialog">
+        <form id="editForm">
+            <h2>Editar Paciente</h2>
+            <input type="hidden" id="edit_id_paciente" name="id_paciente">
+
+            <fieldset>
+                <legend>1. Datos del Paciente</legend>
+                <label for="edit_paciente_dni">DNI:</label>
+                <div class="input-with-button">
+                    <input type="text" id="edit_paciente_dni" name="dni" required maxlength="8">
+                </div>
+                <label for="edit_paciente_nombres">Nombres:</label>
+                <input type="text" id="edit_paciente_nombres" name="nombres" required>
+                <label for="edit_paciente_apellidos">Apellidos:</label>
+                <input type="text" id="edit_paciente_apellidos" name="apellidos" required>
+                <label for="edit_paciente_email">Email:</label>
+                <input type="email" id="edit_paciente_email" name="email">
+            </fieldset>
+            
+            <div class="form-actions">
+                <button type="button" id="cancelEditBtn">Cancelar</button>
+                <button type="submit">Guardar Cambios</button>
             </div>
         </form>
     </dialog>

@@ -25,12 +25,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="user-role" content="<?php echo htmlspecialchars($userRole); ?>">
   <title><?php echo htmlspecialchars($titulo ?? 'Consultorio'); ?> - Gestión Clínica</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="/css/styles.css"> 
   <link rel="stylesheet" href="/css/pacientes.css"> 
+  <link rel="stylesheet" href="/css/agenda.css"> 
+  <link rel="stylesheet" href="/css/citas.css">
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
 </head>
 <body>
   <div class="app" id="app">
@@ -51,8 +55,19 @@
           <?php if ($views_config['pacientes']): ?>
           <div class="nav-item <?php echo ($paginaActiva ?? '') === 'pacientes' ? 'active' : ''; ?>" data-target="pacientes"><a href="/pacientes">👥 Pacientes</a></div>
           <?php endif; ?>
+          <?php if ($views_config['citas']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'citas' ? 'active' : ''; ?>" data-target="citas"><a href="/citas">🗓️ Citas</a></div>
+          <?php endif; ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'reportes' ? 'active' : ''; ?>" data-target="reportes"><a href="/reportes/pacientes">📊 Reportes</a></div>
+        <?php endif; ?>
+        <?php if ( $userRole === 'psicologo'): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'dashboard' ? 'active' : ''; ?>" data-target="dashboard"><a href="/dashboard">📊 Dashboard</a></div>
+          <?php if ($views_config['pacientes']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'pacientes' ? 'active' : ''; ?>" data-target="pacientes"><a href="/pacientes">👥 Pacientes</a></div>
+          <?php endif; ?>
           <?php if ($views_config['agenda']): ?>
           <div class="nav-item <?php echo ($paginaActiva ?? '') === 'agenda' ? 'active' : ''; ?>" data-target="agenda"><a href="/agenda">📅 Agenda</a></div>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'buscar_historial' ? 'active' : ''; ?>" data-target="buscar_historial"><a href="/historial/buscar">🔍 Buscar Historial</a></div>
           <?php endif; ?>
           <div class="nav-item <?php echo ($paginaActiva ?? '') === 'reportes' ? 'active' : ''; ?>" data-target="reportes"><a href="/reportes/pacientes">📊 Reportes</a></div>
         <?php endif; ?>
@@ -75,6 +90,10 @@
           <div class="nav-item <?php echo ($paginaActiva ?? '') === 'reportes' ? 'active' : ''; ?>" data-target="reportes"><a href="/reportes">Reportes</a></div>
  
        <?php endif; ?>
+
+        <?php if ( $userRole === 'cajero'): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'pagos' ? 'active' : ''; ?>" data-target="pagos"><a href="/pagos">💰 Pagos</a></div>
+        <?php endif; ?>
 
       </nav>
 
@@ -130,5 +149,6 @@
       updateClock();
     });
   </script>
+  <?php echo $scripts ?? ''; ?>
 </body>
 </html>

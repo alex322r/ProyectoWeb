@@ -1,132 +1,38 @@
-/* Estilos para el diálogo de perfil de paciente */
-#profileDialog {
-    width: 90%;
-    max-width: 600px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    padding: 0;
-    overflow: hidden; /* Para que los bordes redondeados afecten a los hijos */
-}
-
-#profileDialog::backdrop {
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(3px);
-}
-
-.profile-container {
-    display: flex;
-    flex-direction: column;
-}
-
-/* Encabezado del Perfil */
-.profile-header {
-    background-color: #f7f7f7;
-    padding: 16px 24px;
-    border-bottom: 1px solid #eee;
+.ultima-cita-cell {
+    cursor: pointer;
     position: relative;
 }
 
-.profile-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #333;
+#cita-tooltip {
+  position: absolute;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 1000;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.profile-header p {
-    margin: 4px 0 0;
-    color: #666;
-    font-size: 0.9rem;
+.hidden {
+  display: none;
 }
 
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 1.8rem;
-    cursor: pointer;
-    color: #888;
-    padding: 5px;
-    line-height: 1;
-}
-
-.close-button:hover {
-    color: #333;
-}
-
-/* Cuerpo del Perfil */
-.profile-body {
-    padding: 24px;
-    line-height: 1.6;
-}
-
-.profile-section {
-    margin-bottom: 24px;
-}
-
-.profile-section:last-child {
-    margin-bottom: 0;
-}
-
-.profile-section h3 {
-    margin-top: 0;
-    margin-bottom: 12px;
-    font-size: 1.1rem;
-    color: #444;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
-}
-
-.profile-section p {
-    margin: 8px 0;
-    color: #555;
-}
-
-.profile-section p strong {
-    color: #333;
-    margin-right: 8px;
-}
-
-/* Badge de Estado */
 .status-badge {
-    display: inline-block;
-    padding: 4px 10px;
+    padding: 4px 8px;
     border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
     color: #fff;
 }
-
-.status-en-tratamiento {
-    background-color: #3498db; /* Azul */
+.status-programada, .status-pendiente {
+    background-color: var(--status-pending);
 }
-
-.status-alta {
-    background-color: #2ecc71; /* Verde */
+.status-completada, .status-completado {
+    background-color: var(--status-confirmed);
 }
-
-.status-inactivo {
-    background-color: #95a5a6; /* Gris */
+.status-cancelada {
+    background-color: #757575;
 }
-
-/* Pie de página del Perfil */
-.profile-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 16px 24px;
-    background-color: #f7f7f7;
-    border-top: 1px solid #eee;
-}
-
-.estado-activo {
-    color: green;
-    font-weight: bold;
-}
-
-.estado-inactivo {
-    color: red;
-    font-weight: bold;
+.status-no-asistio {
+    background-color: var(--danger-border);
 }

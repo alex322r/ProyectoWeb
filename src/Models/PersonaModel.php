@@ -45,15 +45,12 @@ class PersonaModel {
         }
     }
 
-    public function editarPersona(int $id_persona, array $data) {
+    public function actualizarPersona(int $id_persona, array $data) {
         $query = "UPDATE persona SET 
             nombres = ?, 
             apellidos = ?, 
             dni = ?, 
-            email = ?, 
-            direccion = ?, 
-            telefono = ?, 
-            fecha_nacimiento = ? 
+            email = ?
             WHERE id_persona = ?";
 
         try {
@@ -63,15 +60,12 @@ class PersonaModel {
                 $data['apellidos'],
                 $data['dni'],
                 $data['email'] ?? null,
-                $data['direccion'] ?? null,
-                $data['telefono'] ?? null,
-                $data['fecha_nacimiento'] ?? null,
                 $id_persona
             ]);
 
-            return ['success' => true, 'message' => 'Persona editada exitosamente.'];
+            return ['success' => true, 'message' => 'Persona actualizada exitosamente.'];
         } catch (Exception $e) {
-            return ['success' => false, 'message' => 'Error al editar la persona: ' . $e->getMessage()];
+            return ['success' => false, 'message' => 'Error al actualizar la persona: ' . $e->getMessage()];
         }
     }
 

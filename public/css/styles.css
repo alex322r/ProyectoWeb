@@ -602,3 +602,14 @@ input[type=number]::-webkit-outer-spin-button {
     background-color: #2f9dec;
     color: white;
 }
+
+/* Patient Statuses */
+.status-en-tratamiento {
+    background-color: var(--status-pending); /* Orange */
+}
+.status-alta {
+    background-color: var(--status-confirmed); /* Green */
+}
+.status-suspendido {
+    background-color: #757575; /* Grey */
+}

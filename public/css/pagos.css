@@ -1,0 +1,93 @@
+.pagos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.search-section {
+    position: relative;
+    max-width: 400px;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon input {
+    width: 100%;
+    padding-right: 30px;
+}
+
+.input-with-icon .search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted-text);
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    box-shadow: var(--shadow);
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.search-results .result-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-results .result-item:hover {
+    background-color: #f0f6fc;
+}
+
+#paciente-info-section, #deudas-section, #historial-pagos-section {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+#paciente-details p {
+    margin: 0 0 8px 0;
+}
+
+.deudas-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.deudas-list h5 {
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.deudas-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.deudas-list li {
+    padding: 10px;
+    background-color: var(--bg);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.hidden {
+    display: none;
+}

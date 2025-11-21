@@ -310,4 +310,22 @@ class EmpleadoModel {
             throw new Exception("Error al obtener nuevos empleados: " . $e->getMessage());
         }
     }
+
+    public function listarPsicologos() {
+        $query = "SELECT 
+                    e.id_empleado,
+                    CONCAT(p.nombres, ' ', p.apellidos) as nombre_completo
+                  FROM empleado e 
+                  JOIN persona p ON e.id_persona = p.id_persona
+                  WHERE e.rol = 'psicologo' AND e.estado = 'activo'";
+
+        try {
+            $stmt = $this->pdo->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        } catch (Exception $e) {
+            error_log("Error listing psychologists: " . $e->getMessage());
+            return [];
+        }
+    }
 }

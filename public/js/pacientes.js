@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("¡Paciente registrado con éxito!");
         dialog.close();
         form.reset();
-        // Aquí podrías agregar una función para recargar la lista de pacientes
+        window.location.reload();
       } else {
         alert("Error al registrar el paciente: " + result.message);
       }
@@ -131,6 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   };
 
+  const userRole = document.querySelector('meta[name="user-role"]').getAttribute('content');
+
   const renderTable = (pacientes) => {
     patientsTable.innerHTML = ''; // Limpiar la tabla
 
@@ -140,23 +142,58 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     pacientes.forEach(paciente => {
-      const row = `
-        <tr>
-          <td>${paciente.id_paciente}</td>
-          <td>${paciente.nombres} ${paciente.apellidos}</td>
-          <td>${paciente.dni}</td>
-          <td>-</td>
-          <td>${paciente.ultima_cita || '-'}</td>
-          <td><button class="btn ghost" onclick="viewProfile(${paciente.id_paciente})">Ver Perfil</button></td>
-        </tr>
-      `;
-      patientsTable.innerHTML += row;
+        let actionsHtml = `<button class="btn ghost" onclick="viewProfile(${paciente.id_paciente})">Ver Perfil</button>`;
+        
+        if (userRole === 'psicologo' || userRole === 'administrador') {
+            actionsHtml += `<a href="/pacientes/expediente/${paciente.id_paciente}" class="btn">Ver Expediente</a>`;
+        }
+
+        if (userRole === 'psicologo') {
+            actionsHtml += `<div class="dropdown">
+                                <button class="btn dropdown-toggle">Cambiar Estado</button>
+                                <div class="dropdown-menu">
+                                    <a href="#" class="dropdown-item" data-id="${paciente.id_paciente}" data-estado="en tratamiento">En Tratamiento</a>
+                                    <a href="#" class="dropdown-item" data-id="${paciente.id_paciente}" data-estado="alta">Dar de Alta</a>
+                                    <a href="#" class="dropdown-item" data-id="${paciente.id_paciente}" data-estado="suspendido">Suspender</a>
+                                </div>
+                            </div>`;
+        }
+
+        if (userRole === 'administrador' || userRole === 'recepcionista') {
+            actionsHtml += `<button class="btn btn-edit" onclick="openEditPatientModal(${paciente.id_paciente})">Editar</button>`;
+            actionsHtml += `<button class="btn btn-danger" onclick="deletePatient(${paciente.id_paciente})">Eliminar</button>`;
+        }
+
+        const ultimaCitaTd = `
+            <td class="ultima-cita-cell"
+                data-estado-cita="${paciente.estado_cita || ''}"
+                data-monto-pago="${paciente.monto_pago || ''}"
+                data-estado-pago="${paciente.estado_pago || ''}">
+                ${paciente.ultima_cita || '-'}
+            </td>
+        `;
+
+        const row = `
+            <tr>
+              <td>${paciente.id_paciente}</td>
+              <td>${paciente.nombres} ${paciente.apellidos}</td>
+              <td>${paciente.dni}</td>
+              <td class="status-cell">
+                  <span class="status-badge status-${paciente.estado.replace(' ', '-')}">
+                      ${paciente.estado}
+                  </span>
+              </td>
+              ${ultimaCitaTd}
+              <td class="actions-cell">${actionsHtml}</td>
+            </tr>
+        `;
+        patientsTable.innerHTML += row;
     });
   };
 
   const search = async (searchTerm) => {
     try {
-      const response = await fetch(`/pacientes/buscar?term=${encodeURIComponent(searchTerm)}`);
+      const response = await fetch(`/api/pacientes/buscar?term=${encodeURIComponent(searchTerm)}`);
       const pacientes = await response.json();
       renderTable(pacientes);
     } catch (error) {
@@ -252,4 +289,162 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Ocurrió un error de red. Inténtalo de nuevo.");
     }
   };
+
+    document.getElementById('patientsTable').addEventListener('click', async (event) => {
+        const target = event.target;
+        
+        // Handle status change dropdown
+        if (target.classList.contains('dropdown-item')) {
+            event.preventDefault();
+            const id_paciente = target.dataset.id;
+            const estado = target.dataset.estado;
+
+            if (confirm(`¿Estás seguro de cambiar el estado del paciente a "${estado}"?`)) {
+                try {
+                    const response = await fetch('/pacientes/actualizarEstado', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id_paciente, estado })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert(result.message);
+                        window.location.reload(); 
+                    } else {
+                        alert(`Error: ${result.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error al actualizar el estado:', error);
+                    alert('Error al conectar con el servidor para actualizar el estado.');
+                }
+            }
+        }
+
+        // Handle tooltip for last appointment
+        const cell = target.closest('.ultima-cita-cell');
+        if (cell) {
+            event.stopPropagation();
+            if (tooltip.classList.contains('hidden')) {
+                showTooltip(cell);
+            } else {
+                hideTooltip();
+            }
+        }
+    });
+
+    const tooltip = document.getElementById('cita-tooltip');
+    const showTooltip = (cell) => {
+        const estadoCita = cell.dataset.estadoCita || 'No disponible';
+        const montoPago = cell.dataset.montoPago ? `$${cell.dataset.montoPago}` : 'No disponible';
+        const estadoPago = cell.dataset.estadoPago || 'No disponible';
+
+        const estadoCitaSpan = document.getElementById('tooltip-estado-cita');
+        estadoCitaSpan.textContent = estadoCita;
+        estadoCitaSpan.className = `status-badge status-${estadoCita.replace(' ', '-')}`;
+
+        document.getElementById('tooltip-monto-pago').textContent = montoPago;
+
+        const estadoPagoSpan = document.getElementById('tooltip-estado-pago');
+        estadoPagoSpan.textContent = estadoPago;
+        estadoPagoSpan.className = `status-badge status-${estadoPago.replace(' ', '-')}`;
+
+        const rect = cell.getBoundingClientRect();
+        tooltip.style.left = `${rect.left + window.scrollX}px`;
+        tooltip.style.top = `${rect.bottom + window.scrollY}px`;
+        tooltip.classList.remove('hidden');
+    };
+
+    const hideTooltip = () => {
+        tooltip.classList.add('hidden');
+    };
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.ultima-cita-cell') && !e.target.closest('#cita-tooltip')) {
+            hideTooltip();
+        }
+    });
+
+    // --- Lógica para Editar Paciente ---
+    const editDialog = document.getElementById("editDialog");
+    const editForm = document.getElementById("editForm");
+    const cancelEditBtn = document.getElementById("cancelEditBtn");
+    const editProfileBtn = document.getElementById("editProfileBtn");
+
+    // Abrir el diálogo de edición y cargar datos
+    window.openEditPatientModal = async (id_paciente) => {
+        try {
+            const response = await fetch(`/pacientes/ver/${id_paciente}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+
+            if (result.success) {
+                const paciente = result.data;
+                document.getElementById("edit_id_paciente").value = paciente.id_paciente;
+                document.getElementById("edit_paciente_dni").value = paciente.dni;
+                document.getElementById("edit_paciente_nombres").value = paciente.nombre_completo.split(' ')[0]; // Assuming first word is name
+                document.getElementById("edit_paciente_apellidos").value = paciente.nombre_completo.split(' ').slice(1).join(' '); // Assuming rest are surnames
+                document.getElementById("edit_paciente_email").value = paciente.email === 'No registrado' ? '' : paciente.email;
+                
+                editDialog.showModal();
+            } else {
+                alert("Error al cargar los datos del paciente para edición: " + result.message);
+            }
+        } catch (error) {
+            console.error('Error al obtener el paciente para edición:', error);
+            alert("No se pudo cargar el paciente para edición.");
+        }
+    };
+
+    // Cerrar el diálogo de edición
+    cancelEditBtn.addEventListener("click", () => {
+        editDialog.close();
+    });
+
+    editDialog.addEventListener("click", (event) => {
+        if (event.target === editDialog) {
+            editDialog.close();
+        }
+    });
+
+    // Manejar el envío del formulario de edición
+    editForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const id_paciente = document.getElementById("edit_id_paciente").value;
+        const formData = new FormData(editForm);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(`/pacientes/actualizar/${id_paciente}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert("¡Paciente actualizado con éxito!");
+                editDialog.close();
+                window.location.reload(); 
+            } else {
+                alert("Error al actualizar el paciente: " + result.message);
+            }
+        } catch (error) {
+            console.error('Error de red al actualizar paciente:', error);
+            alert("Ocurrió un error de red al actualizar el paciente.");
+        }
+    });
+
+    // Link editProfileBtn to openEditPatientModal
+    editProfileBtn.addEventListener("click", () => {
+        const id_paciente = document.getElementById("profile-id_paciente").textContent;
+        profileDialog.close(); // Close profile dialog first
+        openEditPatientModal(parseInt(id_paciente));
+    });
 });
+

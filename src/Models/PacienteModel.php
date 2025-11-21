@@ -125,16 +125,29 @@ class PacienteModel {
                 pe.apellidos,
                 pe.dni,
                 p.estado,
-                (SELECT MAX(c.fecha_hora) FROM cita c WHERE c.id_paciente = p.id_paciente) as ultima_cita
+                c.id_cita AS ultima_cita_id,
+                c.fecha_hora AS ultima_cita,
+                c.estado AS estado_cita,
+                pa.monto AS monto_pago,
+                pa.estado AS estado_pago
             FROM 
                 paciente p
             JOIN 
                 persona pe ON p.id_persona = pe.id_persona
+            LEFT JOIN
+                cita c ON c.id_cita = (
+                    SELECT MAX(c2.id_cita)
+                    FROM cita c2
+                    WHERE c2.id_paciente = p.id_paciente
+                )
+            LEFT JOIN
+                pago pa ON c.id_cita = pa.id_cita
+            WHERE p.estado != 'eliminado'
         ";
 
         $params = [];
         if (!empty($searchTerm)) {
-            $sql .= " WHERE pe.dni LIKE :term OR CONCAT(pe.nombres, ' ', pe.apellidos) LIKE :term";
+            $sql .= " AND (pe.dni LIKE :term OR CONCAT(pe.nombres, ' ', pe.apellidos) LIKE :term)";
             $params[':term'] = '%' . $searchTerm . '%';
         }
 
@@ -253,6 +266,66 @@ class PacienteModel {
         } catch (Exception $e) {
             error_log("Error al listar los ultimos pacientes: " . $e->getMessage());
             return [];
+        }
+    }
+
+    public function updateEstadoPaciente($id_paciente, $estado) {
+        $validStates = ['en tratamiento', 'alta', 'suspendido', 'eliminado'];
+        if (!in_array($estado, $validStates)) {
+            throw new Exception("Estado inválido proporcionado: " . $estado);
+        }
+
+        $sql = "UPDATE paciente SET estado = :estado WHERE id_paciente = :id_paciente";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':estado' => $estado,
+                ':id_paciente' => $id_paciente
+            ]);
+            return ['success' => true, 'message' => 'Estado del paciente actualizado con éxito.'];
+        } catch (Exception $e) {
+            error_log("Error al actualizar el estado del paciente: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Error al actualizar el estado del paciente.'];
+        }
+    }
+
+    public function delete($id_paciente) {
+        return $this->updateEstadoPaciente($id_paciente, 'eliminado');
+    }
+
+    public function actualizarPaciente($id_paciente, $data) {
+        $this->pdo->beginTransaction();
+        try {
+            // 1. Obtener el id_persona del paciente
+            $stmt = $this->pdo->prepare("SELECT id_persona FROM paciente WHERE id_paciente = :id_paciente");
+            $stmt->execute([':id_paciente' => $id_paciente]);
+            $paciente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$paciente) {
+                throw new Exception("Paciente no encontrado.");
+            }
+            $id_persona = $paciente['id_persona'];
+
+            // 2. Actualizar la información en la tabla 'persona'
+            $personaModel = new PersonaModel($this->pdo);
+            $result = $personaModel->actualizarPersona($id_persona, [
+                'dni' => $data['dni'],
+                'nombres' => $data['nombres'],
+                'apellidos' => $data['apellidos'],
+                'email' => $data['email']
+            ]);
+
+            if (!$result['success']) {
+                throw new Exception($result['message']);
+            }
+
+            $this->pdo->commit();
+            return ['success' => true, 'message' => 'Paciente actualizado con éxito.'];
+
+        } catch (Exception $e) {
+            $this->pdo->rollBack();
+            error_log("Error al actualizar paciente: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Hubo un problema al actualizar el paciente.'];
         }
     }
 }
