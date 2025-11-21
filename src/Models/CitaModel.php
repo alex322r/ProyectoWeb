@@ -86,9 +86,7 @@ class CitaModel
             // Create a pending payment for the new appointment
             $pagoResult = $this->pagoModel->crearPagoPendiente(
                 $id_cita, 
-                $data['id_paciente'], 
-                50.00, // Default monto, this could be dynamic
-                'Pago pendiente por cita'
+                50.00 // Default monto, this could be dynamic
             );
 
             if (!$pagoResult['success']) {

@@ -75,18 +75,16 @@ class PagoModel {
         }
     }
 
-    public function crearPagoPendiente($id_cita, $id_paciente, $monto, $descripcion) {
+    public function crearPagoPendiente($id_cita, $monto) {
         $sql = "
-            INSERT INTO pago (id_cita, id_paciente, monto, descripcion, estado)
-            VALUES (:id_cita, :id_paciente, :monto, :descripcion, 'pendiente')
+            INSERT INTO pago (id_cita, monto, estado)
+            VALUES (:id_cita, :monto, 'pendiente')
         ";
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 ':id_cita' => $id_cita,
-                ':id_paciente' => $id_paciente,
-                ':monto' => $monto,
-                ':descripcion' => $descripcion
+                ':monto' => $monto
             ]);
             return ['success' => true, 'id_pago' => $this->pdo->lastInsertId()];
         } catch (Exception $e) {
