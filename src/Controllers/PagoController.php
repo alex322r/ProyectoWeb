@@ -24,6 +24,17 @@ class PagoController
         ]);
     }
 
+    public function historial($id_paciente)
+    {
+        header('Content-Type: application/json');
+        $historial = $this->pagoModel->getHistorialPagos($id_paciente);
+
+        echo json_encode([
+            'success' => true,
+            'data' => $historial,
+        ]);
+    }
+
     public function deudas($id_paciente)
     {
         header('Content-Type: application/json');

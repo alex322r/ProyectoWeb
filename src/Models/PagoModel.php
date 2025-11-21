@@ -75,6 +75,30 @@ class PagoModel {
         }
     }
 
+    public function getHistorialPagos($id_paciente) {
+        $sql = "
+            SELECT 
+                p.fecha_pago,
+                p.monto_pagado_paciente,
+                COALESCE(c.motivo_consulta, pl.nombre) as descripcion
+            FROM pago p
+            LEFT JOIN cita c ON p.id_cita = c.id_cita
+            LEFT JOIN plan_paciente pp ON p.id_plan_paciente = pp.id_plan_paciente
+            LEFT JOIN plan pl ON pp.id_plan = pl.id_plan
+            WHERE c.id_paciente = :id_paciente OR pp.id_paciente = :id_paciente
+            ORDER BY p.fecha_pago DESC
+        ";
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':id_paciente' => $id_paciente]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error al obtener historial de pagos: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function crearPagoPendiente($id_cita, $monto) {
         $sql = "
             INSERT INTO pago (id_cita, monto, monto_pagado_paciente, estado)

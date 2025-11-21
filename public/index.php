@@ -369,6 +369,9 @@ $router->get('/api/auth/failed-logins', [$authController, 'getFailedLoginAttempt
 $router->get('/api/pagos/deudas/(\d+)', function($id) use ($pagoController) {
     $pagoController->deudas($id);
 });
+$router->get('/api/pagos/historial/(\d+)', function($id) use ($pagoController) {
+    $pagoController->historial($id);
+});
 $router->post('/api/pagos/crear', function() use ($pagoController) {
     $pagoController->crear();
 });

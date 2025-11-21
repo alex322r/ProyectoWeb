@@ -58,14 +58,51 @@ document.addEventListener("DOMContentLoaded", () => {
         pacienteDetails.innerHTML = `
             <p><strong>Nombre:</strong> ${paciente.nombre}</p>
             <p><strong>DNI:</strong> ${paciente.dni}</p>
+            <p style="display:none;"><strong>ID:</strong> ${paciente.id}</p>
         `;
         pacienteInfoSection.classList.remove('hidden');
 
-        // Fetch and display debts
+        // Fetch and display debts and history
         fetchDeudas(paciente.id);
+        fetchHistorial(paciente.id);
 
         deudasSection.classList.remove('hidden');
         historialPagosSection.classList.remove('hidden');
+    };
+
+    const fetchHistorial = async (id_paciente) => {
+        try {
+            const response = await fetch(`/api/pagos/historial/${id_paciente}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+
+            if (result.success) {
+                renderHistorial(result.data);
+            } else {
+                alert("Error al cargar el historial de pagos: " + result.message);
+            }
+        } catch (error) {
+            console.error('Error al obtener historial de pagos:', error);
+            alert("No se pudo cargar el historial de pagos del paciente.");
+        }
+    };
+
+    const renderHistorial = (pagos) => {
+        const historialPagosList = document.getElementById("historial-pagos-list");
+        historialPagosList.innerHTML = '';
+        if (pagos.length === 0) {
+            historialPagosList.innerHTML = '<li>No hay pagos registrados.</li>';
+            return;
+        }
+        pagos.forEach(pago => {
+            const item = document.createElement('li');
+            item.innerHTML = `
+                <span>${new Date(pago.fecha_pago).toLocaleString()} - S/ ${pago.monto_pagado_paciente} - ${pago.descripcion}</span>
+            `;
+            historialPagosList.appendChild(item);
+        });
     };
 
     const fetchDeudas = async (id_paciente) => {
@@ -201,9 +238,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (result.success) {
                 alert("Pago registrado exitosamente.");
                 dialog.close();
-                // Refresh the debts list
-                const pacienteId = document.getElementById("paciente-details").querySelector("p").textContent.split(": ")[1];
+                // Refresh the debts and history lists
+                const pacienteIdText = document.getElementById("paciente-details").querySelector("p:nth-child(3)").textContent;
+                const pacienteId = pacienteIdText.split(": ")[1];
                 fetchDeudas(pacienteId);
+                fetchHistorial(pacienteId);
             } else {
                 alert("Error al registrar el pago: " + result.message);
             }
