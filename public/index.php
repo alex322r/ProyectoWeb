@@ -367,7 +367,7 @@ $router->get('/api/empleados/nuevos', [$empleadoController, 'getNewUsers']);
 $router->get('/api/empleados/listar/psicologo', [$empleadoController, 'listarPsicologos']);
 $router->get('/api/auth/failed-logins', [$authController, 'getFailedLoginAttempts']);
 $router->get('/api/pagos/deudas/(\d+)', function($id) use ($pagoController) {
-    $pagoController->getDeudas($id);
+    $pagoController->deudas($id);
 });
 $router->post('/api/pagos/crear', function() use ($pagoController) {
     $pagoController->crear();
