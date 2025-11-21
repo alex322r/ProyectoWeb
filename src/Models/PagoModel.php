@@ -102,14 +102,13 @@ class PagoModel {
     public function crearPagoPendiente($id_cita, $monto) {
         $sql = "
             INSERT INTO pago (id_cita, monto, monto_pagado_paciente, estado)
-            VALUES (:id_cita, :monto, :monto_pagado_paciente, 'pendiente')
+            VALUES (:id_cita, :monto, 0, 'pendiente')
         ";
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 ':id_cita' => $id_cita,
                 ':monto' => $monto,
-                ':monto_pagado_paciente' => 0.00 // Set to 0 as it is a pending payment
             ]);
             return ['success' => true, 'id_pago' => $this->pdo->lastInsertId()];
         } catch (Exception $e) {
