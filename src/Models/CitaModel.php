@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use PDO;
 use Exception;
 use App\Models\PagoModel; // Include PagoModel
 
