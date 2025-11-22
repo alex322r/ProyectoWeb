@@ -64,4 +64,16 @@ class PagoController
             echo json_encode(['success' => false, 'message' => $result['message']]);
         }
     }
+
+    public function reportes()
+    {
+        $pagos = $this->pagoModel->getPagosDelDia();
+
+        return [
+            'view' => 'reportes_caja.php',
+            'titulo' => 'Reporte de Caja',
+            'paginaActiva' => 'reportes',
+            'pagos' => $pagos,
+        ];
+    }
 }

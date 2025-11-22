@@ -171,6 +171,37 @@ $router->get('/dashboard', function() use ($dashboardController) {
 
 $router->get('/pagos', [$pagoController, 'index']);
 
+$router->get('/documentos', function() {
+    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'cajero') {
+        header('Location: /dashboard');
+        exit();
+    }
+    view('documentos', [
+        'titulo' => 'Documentos',
+        'paginaActiva' => 'documentos'
+    ]);
+});
+
+$router->get('/caja', function() {
+    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'cajero') {
+        header('Location: /dashboard');
+        exit();
+    }
+    view('caja', [
+        'titulo' => 'Caja',
+        'paginaActiva' => 'caja'
+    ]);
+});
+
+$router->get('/reportes/caja', function() use ($pagoController) {
+    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'cajero') {
+        header('Location: /dashboard');
+        exit();
+    }
+    $data = $pagoController->reportes();
+    view('reportes_caja', $data);
+});
+
 $router->get('/historial/buscar', function() use ($historialController) {
     $historialController->index();
 });
