@@ -194,7 +194,7 @@ $router->get('/caja', function() {
 });
 
 $router->get('/reportes/caja', function() use ($pagoController) {
-    if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'cajero') {
+    if (!isset($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['cajero', 'administrador'])) {
         header('Location: /dashboard');
         exit();
     }

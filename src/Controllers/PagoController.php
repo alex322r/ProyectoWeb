@@ -69,6 +69,8 @@ class PagoController
     {
         $pagos = $this->pagoModel->getPagosDelDia();
 
+        error_log('Pagos del día: ' . print_r($pagos, true));
+
         return [
             'view' => 'reportes_caja.php',
             'titulo' => 'Reporte de Caja',

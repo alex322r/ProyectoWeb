@@ -481,6 +481,7 @@ input[type=number]::-webkit-outer-spin-button {
   background-color: #C62828; /* Un rojo más oscuro al pasar el ratón */
 }
 
+
 /* Estilos para el dialog de perfil de empleado */
 #profileDialog {
     border: none;
@@ -539,6 +540,130 @@ input[type=number]::-webkit-outer-spin-button {
 
 #profileDialog #closeProfileBtn:hover {
     background-color: var(--accent-hover);
+}
+
+/* Estilos para el dialog de registro de empleado */
+#registerDialog {
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    background-color: var(--card-bg);
+    max-width: 600px; /* Ancho máximo para el formulario de registro */
+    width: 90%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    display: none;
+}
+
+#registerDialog[open] {
+    display: block;
+}
+
+#registerDialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#registerDialog h2 {
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+}
+
+#registerDialog form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#registerDialog fieldset {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#registerDialog legend {
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 0 10px;
+    margin-left: -10px;
+}
+
+#registerDialog label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+#registerDialog input[type="text"],
+#registerDialog input[type="number"],
+#registerDialog input[type="email"],
+#registerDialog input[type="date"],
+#registerDialog select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background-color: #ffffff;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#registerDialog input:focus,
+#registerDialog select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+    outline: none;
+}
+
+#registerDialog .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+}
+
+#registerDialog .form-actions button {
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+#registerDialog .form-actions button[type="button"] { /* Cancelar */
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--accent);
+}
+
+#registerDialog .form-actions button[type="button"]:hover {
+    background: #fdefe3;
+    border-color: var(--accent);
+}
+
+#registerDialog .form-actions button[type="submit"] { /* Guardar */
+    background: var(--accent);
+    color: var(--accent-text);
+    border: 1px solid var(--accent);
+}
+
+#registerDialog .form-actions button[type="submit"]:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* =============================

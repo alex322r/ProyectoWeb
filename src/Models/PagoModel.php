@@ -164,19 +164,17 @@ class PagoModel {
         $sql = "
             SELECT 
                 p.fecha_pago,
-                p.monto_pagado_paciente,
+                p.monto,
                 mp.tipo as metodo_pago,
-                COALESCE(CONCAT(per_pac.nombres, ' ', per_pac.apellidos), CONCAT(per_emp.nombres, ' ', per_emp.apellidos)) as persona,
+                CONCAT(per.nombres, ' ', per.apellidos) as persona,
                 COALESCE(c.motivo_consulta, pl.nombre) as descripcion
             FROM pago p
-            LEFT JOIN cita c ON p.id_cita = c.id_cita
-            LEFT JOIN paciente pac ON c.id_paciente = pac.id_paciente
-            LEFT JOIN persona per_pac ON pac.id_persona = per_pac.id_persona
-            LEFT JOIN plan_paciente pp ON p.id_plan_paciente = pp.id_plan_paciente
-            LEFT JOIN plan pl ON pp.id_plan = pl.id_plan
             LEFT JOIN metodo_pago mp ON p.id_metodo_pago = mp.id_metodo_pago
-            LEFT JOIN empleado emp ON p.id_empleado_caja = emp.id_empleado
-            LEFT JOIN persona per_emp ON emp.id_persona = per_emp.id_persona
+            LEFT JOIN cita c ON p.id_cita = c.id_cita
+            LEFT JOIN plan_paciente pp ON p.id_plan_paciente = pp.id_plan_paciente
+            LEFT JOIN paciente pac ON pac.id_paciente = COALESCE(c.id_paciente, pp.id_paciente)
+            LEFT JOIN persona per ON pac.id_persona = per.id_persona
+            LEFT JOIN plan pl ON pp.id_plan = pl.id_plan
             WHERE DATE(p.fecha_pago) = CURDATE()
             ORDER BY p.fecha_pago DESC
         ";

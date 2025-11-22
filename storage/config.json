@@ -10,6 +10,7 @@
         "citas": true,
         "registros": true,
         "backup": true,
-        "planes": true
+        "planes": true,
+        "reportes": true
     }
 }

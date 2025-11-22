@@ -11,7 +11,7 @@
                         <thead>
                             <tr>
                                 <th>Fecha y Hora</th>
-                                <th>Monto Pagado</th>
+                                <th>Monto</th>
                                 <th>Método de Pago</th>
                                 <th>Persona</th>
                                 <th>Descripción</th>
@@ -20,8 +20,18 @@
                         <tbody>
                             <?php foreach ($pagos as $pago): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($pago['fecha_pago']); ?></td>
-                                    <td><?php echo htmlspecialchars(number_format($pago['monto_pagado_paciente'], 2)); ?></td>
+                                    <td>
+                                        <?php
+                                            try {
+                                                $date = new DateTime($pago['fecha'], new DateTimeZone('UTC'));
+                                                $date->setTimezone(new DateTimeZone('America/Mexico_City'));
+                                                echo htmlspecialchars($date->format('d/m/Y h:i A'));
+                                            } catch (Exception $e) {
+                                                echo htmlspecialchars($pago['fecha']);
+                                            }
+                                        ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars(number_format($pago['monto'], 2)); ?></td>
                                     <td><?php echo htmlspecialchars($pago['metodo_pago']); ?></td>
                                     <td><?php echo htmlspecialchars($pago['persona']); ?></td>
                                     <td><?php echo htmlspecialchars($pago['descripcion']); ?></td>

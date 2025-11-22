@@ -93,6 +93,9 @@
 
         <?php if ( $userRole === 'cajero'): ?>
           <div class="nav-item <?php echo ($paginaActiva ?? '') === 'pagos' ? 'active' : ''; ?>" data-target="pagos"><a href="/pagos">💰 Pagos</a></div>
+          <?php if ($views_config['reportes']): ?>
+          <div class="nav-item <?php echo ($paginaActiva ?? '') === 'reportes_caja' ? 'active' : ''; ?>" data-target="reportes_caja"><a href="/reportes/caja">📊 Reportes</a></div>
+          <?php endif; ?>
         <?php endif; ?>
 
       </nav>

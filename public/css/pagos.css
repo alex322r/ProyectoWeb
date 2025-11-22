@@ -91,3 +91,115 @@
 .hidden {
     display: none;
 }
+
+/* Estilos para el dialog de registrar pago */
+#registrarPagoDialog {
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    background-color: var(--card-bg);
+    max-width: 450px;
+    width: 90%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    display: none; /* Oculto por defecto, se muestra con showModal() */
+}
+
+#registrarPagoDialog[open] {
+    display: block; /* Se muestra cuando el atributo 'open' está presente */
+}
+
+#registrarPagoDialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#registrarPagoDialog h2 {
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+}
+
+#registrarPagoDialog p {
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
+#registrarPagoDialog p strong {
+    color: var(--text-primary);
+}
+
+#registrarPagoDialog label {
+    display: block;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+#registrarPagoDialog input[type="number"],
+#registrarPagoDialog select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background-color: #ffffff;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#registrarPagoDialog input:focus,
+#registrarPagoDialog select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.2);
+    outline: none;
+}
+
+#registrarPagoDialog .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+}
+
+#registrarPagoDialog .form-actions button {
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 15px;
+    transition: all 0.2s ease;
+}
+
+#registrarPagoDialog .form-actions button[type="button"] { /* Cancelar */
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--accent);
+}
+
+#registrarPagoDialog .form-actions button[type="button"]:hover {
+    background: #fdefe3;
+    border-color: var(--accent);
+}
+
+#registrarPagoDialog .form-actions button[type="submit"] { /* Registrar Pago */
+    background: var(--accent);
+    color: var(--accent-text);
+    border: 1px solid var(--accent);
+}
+
+#registrarPagoDialog .form-actions button[type="submit"]:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
