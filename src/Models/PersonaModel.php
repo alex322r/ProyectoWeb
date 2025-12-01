@@ -45,12 +45,15 @@ class PersonaModel {
         }
     }
 
-    public function actualizarPersona(int $id_persona, array $data) {
+    public function editarPersona(int $id_persona, array $data) {
         $query = "UPDATE persona SET 
             nombres = ?, 
             apellidos = ?, 
             dni = ?, 
-            email = ?
+            email = ?,
+            direccion = ?,
+            telefono = ?,
+            fecha_nacimiento = ?
             WHERE id_persona = ?";
 
         try {
@@ -60,6 +63,9 @@ class PersonaModel {
                 $data['apellidos'],
                 $data['dni'],
                 $data['email'] ?? null,
+                $data['direccion'] ?? null,
+                $data['telefono'] ?? null,
+                $data['fecha_nacimiento'] ?? null,
                 $id_persona
             ]);
 

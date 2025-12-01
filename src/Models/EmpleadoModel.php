@@ -54,8 +54,9 @@ class EmpleadoModel {
             colegiatura,
             especialidad,
             usuario,
-            clave
-        ) VALUES (?, ?, ?, ?, ?, ?)";
+            clave,
+            cambiar_clave
+        ) VALUES (?, ?, ?, ?, ?, ?, 1)";
         try {
             $stmt = $this->pdo->prepare($query);
             $stmt->execute([
@@ -250,6 +251,8 @@ class EmpleadoModel {
                     p.dni, 
                     e.rol, 
                     e.usuario,
+                    p.nombres,
+                    p.apellidos,
                     CONCAT(p.nombres, ' ', p.apellidos) as nombre_completo,
                     p.email,
                     p.direccion,

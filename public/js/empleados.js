@@ -1,4 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const errorDialog = document.getElementById('errorDialog');
+    const errorDialogP = errorDialog ? errorDialog.querySelector('p') : null;
+    const closeErrorDialogBtn = document.getElementById('closeErrorDialog');
+
+    if (closeErrorDialogBtn) {
+        closeErrorDialogBtn.addEventListener('click', () => {
+            errorDialog.close();
+        });
+    }
+
+    function showErrorDialog(message) {
+        if (errorDialog && errorDialogP) {
+            errorDialogP.textContent = message;
+            errorDialog.showModal();
+        } else {
+            console.error("Error: #errorDialog or its <p> element not found.");
+            alert(message); // Fallback to alert if dialog not found
+        }
+    }
+
     // --- 1. Seleccionar Elementos del DOM ---
     const dialog = document.getElementById("registerDialog");
     const openBtn = document.getElementById("openEmpleadosBtn");
@@ -29,6 +49,62 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    form.addEventListener('submit', (e) => {
+        const dni = form.querySelector('#empleado_dni').value;
+        const nombres = form.querySelector('#empleado_nombres').value;
+        const apellidos = form.querySelector('#empleado_apellidos').value;
+        const email = form.querySelector('#empleado_email').value;
+        const direccion = form.querySelector('#empleado_direccion').value;
+        const telefono = form.querySelector('#empleado_telefono').value;
+        const fechaNacimiento = form.querySelector('#empleado_fecha_nacimiento').value;
+
+        if (!/^\d{8}$/.test(dni)) {
+            e.preventDefault();
+            showErrorDialog("El DNI debe tener 8 dígitos.");
+            return;
+        }
+
+        if (nombres.trim().length < 2) {
+            e.preventDefault();
+            showErrorDialog("El nombre debe tener al menos 2 caracteres.");
+            return;
+        }
+
+        if (apellidos.trim().length < 2) {
+            e.preventDefault();
+            showErrorDialog("El apellido debe tener al menos 2 caracteres.");
+            return;
+        }
+
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            e.preventDefault();
+            showErrorDialog("El formato del correo electrónico no es válido.");
+            return;
+        }
+
+        if (direccion && direccion.trim().length < 5) {
+            e.preventDefault();
+            showErrorDialog("La dirección debe tener al menos 5 caracteres.");
+            return;
+        }
+
+        if (telefono && !/^\d{7,15}$/.test(telefono)) {
+            e.preventDefault();
+            showErrorDialog("El teléfono debe tener entre 7 y 15 dígitos.");
+            return;
+        }
+
+        if (fechaNacimiento) {
+            const fecha = new Date(fechaNacimiento);
+            const hoy = new Date();
+            if (fecha > hoy) {
+                e.preventDefault();
+                showErrorDialog("La fecha de nacimiento no puede ser futura.");
+                return;
+            }
+        }
+    });
+
     // --- 3. Lógica del Formulario ---
 
     window.editProfile = async (id) => {
@@ -41,9 +117,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Llenar el formulario con los datos del empleado
             form.querySelector('#empleado_dni').value = data.dni;
-            const [nombres, ...apellidos] = data.nombre_completo.split(' ');
-            form.querySelector('#empleado_nombres').value = nombres;
-            form.querySelector('#empleado_apellidos').value = apellidos.join(' ');
+            form.querySelector('#empleado_nombres').value = data.nombres;
+            form.querySelector('#empleado_apellidos').value = data.apellidos;
             form.querySelector('#empleado_email').value = data.email;
             form.querySelector('#empleado_direccion').value = data.direccion;
             form.querySelector('#empleado_telefono').value = data.telefono;
@@ -58,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
             dialog.showModal();
         } catch (error) {
             console.error(error);
-            alert("No se pudo cargar el perfil del empleado para editar.");
+            showErrorDialog("No se pudo cargar el perfil del empleado para editar.");
         }
     };
 
@@ -89,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
             profileDialog.showModal();
         } catch (error) {
             console.error(error);
-            alert("No se pudo cargar el perfil del empleado.");
+            showErrorDialog("No se pudo cargar el perfil del empleado.");
         }
     };
 

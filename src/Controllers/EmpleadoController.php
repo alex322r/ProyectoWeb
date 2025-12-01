@@ -22,13 +22,67 @@ class EmpleadoController {
             header('Location: /empleados');
             exit;
         }
-        
         $data = $_POST;
 
         if (empty($data['empleado_dni'])) {
             $_SESSION['error_message'] = 'El DNI del empleado es obligatorio.';
             header('Location: /empleados');
             exit;
+        }
+
+        if (!preg_match('/^\d{8}$/', $data['empleado_dni'])) {
+            $_SESSION['error_message'] = 'El DNI debe tener 8 dígitos.';
+            header('Location: /empleados');
+            exit;
+        }
+
+        if (!empty($data['empleado_email']) && !filter_var($data['empleado_email'], FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error_message'] = 'El correo electrónico no es válido.';
+            header('Location: /empleados');
+            exit;
+        }
+
+        if (!empty($data['empleado_fecha_nacimiento'])) {
+            $fecha_nacimiento = new \DateTime($data['empleado_fecha_nacimiento']);
+            $hoy = new \DateTime();
+            if ($fecha_nacimiento > $hoy) {
+                $_SESSION['error_message'] = 'La fecha de nacimiento no puede ser en el futuro.';
+                header('Location: /empleados');
+                exit;
+            }
+        }
+
+        if (empty($data['empleado_nombres']) || strlen(trim($data['empleado_nombres'])) < 2) {
+            $_SESSION['error_message'] = 'El nombre es obligatorio y debe tener al menos 2 caracteres.';
+            header('Location: /empleados');
+            exit;
+        }
+        
+        if (empty($data['empleado_apellidos']) || strlen(trim($data['empleado_apellidos'])) < 2) {
+            $_SESSION['error_message'] = 'El apellido es obligatorio y debe tener al menos 2 caracteres.';
+            header('Location: /empleados');
+            exit;
+        }
+
+        if (!empty($data['empleado_direccion']) && strlen(trim($data['empleado_direccion'])) < 5) {
+             $_SESSION['error_message'] = 'La dirección debe tener al menos 5 caracteres.';
+             header('Location: /empleados');
+             exit;
+        }
+
+        if (!empty($data['empleado_telefono']) && !preg_match('/^\d{7,15}$/', $data['empleado_telefono'])) {
+             $_SESSION['error_message'] = 'El teléfono debe tener entre 7 y 15 dígitos.';
+             header('Location: /empleados');
+             exit;
+        }
+
+        // Generar usuario automáticamente: nombre.apellido
+        if (empty($data['usuario'])) {
+            $nombre = explode(' ', trim($data['empleado_nombres']))[0];
+            $apellido = explode(' ', trim($data['empleado_apellidos']))[0];
+            $usuarioBase = strtolower($nombre . '.' . $apellido);
+            $usuarioBase = preg_replace('/[^a-z0-9.]/', '', $usuarioBase); // Sanitize
+            $data['usuario'] = $usuarioBase;
         }
 
         try {
@@ -118,6 +172,52 @@ class EmpleadoController {
             $_SESSION['error_message'] = 'El DNI del empleado es obligatorio.';
             header('Location: /empleados');
             exit;
+        }
+
+        if (!preg_match('/^\d{8}$/', $data['empleado_dni'])) {
+            $_SESSION['error_message'] = 'El DNI debe tener 8 dígitos.';
+            header('Location: /empleados');
+            exit;
+        }
+
+        if (!empty($data['empleado_email']) && !filter_var($data['empleado_email'], FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error_message'] = 'El correo electrónico no es válido.';
+            header('Location: /empleados');
+            exit;
+        }
+
+        if (!empty($data['empleado_fecha_nacimiento'])) {
+            $fecha_nacimiento = new \DateTime($data['empleado_fecha_nacimiento']);
+            $hoy = new \DateTime();
+            if ($fecha_nacimiento > $hoy) {
+                $_SESSION['error_message'] = 'La fecha de nacimiento no puede ser en el futuro.';
+                header('Location: /empleados');
+                exit;
+            }
+        }
+
+        if (empty($data['empleado_nombres']) || strlen(trim($data['empleado_nombres'])) < 2) {
+            $_SESSION['error_message'] = 'El nombre es obligatorio y debe tener al menos 2 caracteres.';
+            header('Location: /empleados');
+            exit;
+        }
+        
+        if (empty($data['empleado_apellidos']) || strlen(trim($data['empleado_apellidos'])) < 2) {
+            $_SESSION['error_message'] = 'El apellido es obligatorio y debe tener al menos 2 caracteres.';
+            header('Location: /empleados');
+            exit;
+        }
+
+        if (!empty($data['empleado_direccion']) && strlen(trim($data['empleado_direccion'])) < 5) {
+             $_SESSION['error_message'] = 'La dirección debe tener al menos 5 caracteres.';
+             header('Location: /empleados');
+             exit;
+        }
+
+        if (!empty($data['empleado_telefono']) && !preg_match('/^\d{7,15}$/', $data['empleado_telefono'])) {
+             $_SESSION['error_message'] = 'El teléfono debe tener entre 7 y 15 dígitos.';
+             header('Location: /empleados');
+             exit;
         }
 
         try {

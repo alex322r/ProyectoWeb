@@ -10,13 +10,15 @@ class DB {
     private $pdo;
 
     private function __construct() {
-        $host = 'localhost';
-        $db = 'consultorio-psicologico';
-        $user = 'root';
-        $pass = '';
+        $config = Config::get('db');
+
+        $host = $config['host'] ?? 'localhost';
+        $db = $config['name'] ?? 'consultorio_psicologico';
+        $user = $config['user'] ?? 'root';
+        $pass = $config['pass'] ?? '';
         $charset = 'utf8mb4';
 
-        $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+        $dsn = "mysql:host=$host;port=3306;dbname=$db;charset=$charset";
         $options = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

@@ -67,6 +67,13 @@ class AuthController
             $_SESSION['user_role'] = $user['rol'];
             session_regenerate_id(true); // Seguridad contra fijación de sesión
 
+            // Check for forced password change
+            if (isset($user['cambiar_clave']) && $user['cambiar_clave'] == 1) {
+                $_SESSION['force_change_password'] = true;
+                header('Location: /change-password');
+                exit;
+            }
+
             // Redirigimos al dashboard
             header('Location: /dashboard');
             exit;
@@ -97,6 +104,53 @@ class AuthController
             }
             exit;
         }
+    }
+
+    public function showChangePasswordForm()
+    {
+        if (!isset($_SESSION['user_id']) || !isset($_SESSION['force_change_password'])) {
+            header('Location: /login');
+            exit;
+        }
+        view('change_password', ['titulo' => 'Cambiar Contraseña']);
+    }
+
+    public function handleChangePassword()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $clave = $_POST['clave'] ?? null;
+        $confirmar_clave = $_POST['confirmar_clave'] ?? null;
+
+        if (!$clave || !$confirmar_clave) {
+            header('Location: /change-password?error=Faltan datos');
+            exit;
+        }
+
+        if ($clave !== $confirmar_clave) {
+            header('Location: /change-password?error=Las contraseñas no coinciden');
+            exit;
+        }
+
+        // Enforce password strength (optional but recommended)
+        if (strlen($clave) < 6) {
+             header('Location: /change-password?error=La contraseña debe tener al menos 6 caracteres');
+             exit;
+        }
+
+        // Update password and clear flag
+        $hash = password_hash($clave, PASSWORD_BCRYPT);
+        $stmt = $this->pdo->prepare("UPDATE empleado SET clave = ?, cambiar_clave = 0 WHERE id_empleado = ?");
+        $stmt->execute([$hash, $_SESSION['user_id']]);
+
+        // Clear force flag
+        unset($_SESSION['force_change_password']);
+
+        header('Location: /dashboard?message=Contraseña actualizada');
+        exit;
     }
 
     // Maneja el logout

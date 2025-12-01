@@ -32,6 +32,25 @@ if (file_exists($maintenance_flag_file)) {
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/audit_log.php';
 
+use App\Controllers\SetupController;
+use App\Config;
+
+if (!file_exists(__DIR__ . '/../storage/installed.lock')) {
+    $router = new \Bramus\Router\Router();
+    $setupController = new SetupController();
+
+    $router->get('/setup', [$setupController, 'index']);
+    $router->post('/setup/install', [$setupController, 'install']);
+    
+    // Redirect any other request to /setup
+    $router->set404(function() {
+        header('Location: /setup');
+    });
+
+    $router->run();
+    exit();
+}
+
 
 function view($name, $data = []) {
 
@@ -49,6 +68,11 @@ function view($name, $data = []) {
 
   if ($name === 'inactive_account') {
     require __DIR__ . "/../views/inactive_account.php";
+    return;
+  }
+
+  if ($name === 'change_password') {
+    require __DIR__ . "/../views/change_password.php";
     return;
   }
 
@@ -75,9 +99,10 @@ use App\Controllers\AgendaController;
 use App\Controllers\HistorialController;
 use App\Controllers\PagoController;
 
-$dsn = 'mysql:host=127.0.0.1;dbname=consultorio_psicologico';
-$usuario = 'root';
-$pass = '';
+$dbConfig = Config::get('db');
+$dsn = "mysql:host=" . ($dbConfig['host'] ?? 'localhost') . ";port=3306;dbname=" . ($dbConfig['name'] ?? 'consultorio_psicologico');
+$usuario = $dbConfig['user'] ?? 'root';
+$pass = $dbConfig['pass'] ?? '';
 $options = [
   PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -123,6 +148,8 @@ $router->before('GET', '/login', function() {
 $router->get('/login', [$authController, 'showLoginForm']);
 $router->post('/login', [$authController, 'handleLogin']);
 $router->get('/logout', [$authController, 'logout']);
+$router->get('/change-password', [$authController, 'showChangePasswordForm']);
+$router->post('/change-password', [$authController, 'handleChangePassword']);
 
 // Ruta para informar al usuario que su cuenta está inactiva
 $router->get('/inactive-account', function() {
@@ -150,6 +177,12 @@ $router->before('GET|POST', '/(dashboard|pacientes|pacientes/delete|agenda|pagos
     if (!isset($_SESSION['user_id'])) {
         header('Location: /login');
         exit(); // Detenemos la ejecución
+    }
+
+    // If forced to change password, redirect to change password page
+    if (isset($_SESSION['force_change_password']) && $_SESSION['force_change_password'] === true) {
+        header('Location: /change-password');
+        exit();
     }
 
     try {

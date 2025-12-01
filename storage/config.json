@@ -12,5 +12,11 @@
         "backup": true,
         "planes": true,
         "reportes": true
+    },
+    "db": {
+        "host": "127.0.0.1",
+        "name": "consultorio_psicologico",
+        "user": "root",
+        "pass": ""
     }
 }

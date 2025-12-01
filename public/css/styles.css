@@ -481,6 +481,47 @@ input[type=number]::-webkit-outer-spin-button {
   background-color: #C62828; /* Un rojo más oscuro al pasar el ratón */
 }
 
+/* Estilos para el dialog de éxito */
+#successDialog {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  background-color: var(--card-bg);
+  max-width: 400px;
+  text-align: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+}
+
+#successDialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+#successDialog p {
+  color: var(--status-confirmed);
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+#successDialog button {
+  background-color: var(--status-confirmed);
+  color: var(--accent-text);
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+#successDialog button:hover {
+  background-color: #388E3C; /* A darker green */
+}
+
 
 /* Estilos para el dialog de perfil de empleado */
 #profileDialog {
